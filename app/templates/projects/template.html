@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ id }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
+    <script
+      src="https://kit.fontawesome.com/c640195d93.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../scripts/table-of-contents.js"></script>
+    <script src="../scripts/progress-bar.js"></script>
+  </head>
+  <body>
+    <header>
+      <div id="header-name">
+        <a href="/"
+          ><h1 class="bg-name">
+            <span id="name-light">Benjamin </span> Ahlbrecht
+          </h1></a
+        >
+      </div>
+      <div id="header-social">
+        <ul>
+          <li>
+            <a href="https://github.com/benjamin-ahlbrecht"
+              ><i class="fa-brands fa-github fa-beat-hover"></i
+            ></a>
+          </li>
+          <li>
+            <a href="https://linkedin.com/in/benjamin-ahlbrecht"
+              ><i class="fa-brands fa-linkedin-in fa-beat-hover"></i
+            ></a>
+          </li>
+        </ul>
+      </div>
+      <div id="header-space"></div>
+      <div id="header-projects">
+        <a href="/#projects" class="pretty-link">Projects</a>
+      </div>
+      <div id="header-about">
+        <a href="/#about" class="pretty-link">About</a>
+      </div>
+      <div id="header-contact">
+        <a href="/#contact" class="pretty-link">Contact</a>
+      </div>
+      <div id="header-progress">
+        <div id="header-progress-inner"></div>
+      </div>
+    </header>
+    <main class="article">
+      <div id="article-navigation">
+        <div>
+          <p id="toc-title">Contents</p>
+          <ol id="table-of-contents"></ol>
+        </div>
+      </div>
+      <div id="article-content">{% block content %}{% endblock content %}</div>
+      <div id="article-space"></div>
+    </main>
+  </body>
+</html>
