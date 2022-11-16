@@ -53,7 +53,7 @@ p {
     line-height: 150%;
     text-align: justify;
     color: white;
-    font-size: 24px;
+    font-size: 22px;
 }
 
 h6 {
@@ -300,6 +300,7 @@ header {
     top: 0;
     width: 100%;
     background-color: var(--content);
+    z-index: 999;
 
     /* 2 Row grid for main-header and progress bar */
     display: grid;
@@ -513,3 +514,16 @@ div:hover > #project-title {
     font-style: italic;
 }
 
+ol > li {
+    color: var(--text);
+    font-size: 20px;
+    margin: 0px 20px 20px 0px;
+}
+
+
+.figure {
+    text-align: center;
+    width: 100%;
+    max-width: 100%;
+    max-height: auto;
+}
