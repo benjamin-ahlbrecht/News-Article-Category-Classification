@@ -1,0 +1,17 @@
+{% extends "template.html" %} {% block content %}
+<h2 id="Hello World">Hello World</h2>
+<p>
+  This file serves as a template for a project's front-end. It inherits the CSS
+  styling and file structure of the main site projects. This is done to
+  eventually facilitate project integration into the main site. H2 and H3
+  headings will be automatically recorded in the table-of-contents according to
+  the heading's tag identifier. Interactive elements can be added by interacting
+  with the underlying API located at project-template/app/main.py. The Jinja2
+  templating engine is used to inherit the template.html file and styles are
+  linked from project-template/app/static/styles.css. Each project-template is
+  designed to served as a single Docker container, which will be implemented
+  into the main site via docker-compose, docker-swarm, or another container
+  orchestration software. Thus, each project (it's front-end, models, and API
+  back-end) is served as a micro-service within the main project site.
+</p>
+{% endblock content %}

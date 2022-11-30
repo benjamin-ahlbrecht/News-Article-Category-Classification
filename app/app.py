@@ -10,11 +10,11 @@ from jinja2.exceptions import TemplateNotFound
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/scripts", StaticFiles(directory="scripts"), name="scripts")
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="html")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_project(request:Request):
     return templates.TemplateResponse(
-        name="projects/project.html",
+        name="index.html",
         context={"request": request}
     )

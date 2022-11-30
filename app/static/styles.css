@@ -1,134 +1,30 @@
+/* Define CSS variables */
 :root {
-    --dark: rgb(15, 16, 16);
-    --content: rgb(32, 32, 32);
-    --content-opaque: rgba(18, 18, 18, 0.5);
-    --background: rgb(44, 45, 47); 
-    --form-input: #282828;
+    --nero: rgb(32, 32, 32);
+    --black-russian: rgba(31, 31, 35, 1);
+    --dark: rgba(18, 18, 19, 1);
+    --nero-light: #282828;
     --text: #FFFFFF;
     --text-back: #B3B3B3;
-    --onyx: #404040;
+
+    --background: rgba(20, 20, 22, 1);
+    --background-opaque: rgba(20, 20, 22, 0.8);
+
     --red: rgb(160, 16, 16);
     --red-opaque: rgba(120, 16, 16, 0.5);
     --green: rgb(32, 96, 32);
     --blue: rgb(32, 32, 130);
     --blue-bright: rgb(64, 64, 260);
-
-    --a: 5px;
-    --b: -5px
-}
-
-.fa-beat-hover:hover {
-    animation:fa-beat-hover 0.75s ease infinite;
-    animation-direction: alternate;
-  }
-  @keyframes fa-beat-hover {
-    from {transform: scale(1);}
-    to {transform: scale(1.125);}
-
-  }
-
-h1, h2, h3, h4, h5, h6 {
-    display: inline-block;
-    color: var(--text);
-    scroll-margin-top: 100px;
-    margin: 10px 0;
-}
-
-h1 > a,
-h2 > a,
-h3 > a,
-h4 > a,
-h5 > a,
-h6 > a,
-p > a {
-    font-size: inherit;
-    font-style: inherit;
-    font-weight: inherit;
-    margin: inherit;
-    padding: inherit;
-}
-
-p {
-    font-size: 20px;
-    line-height: 150%;
-    text-align: justify;
-    color: white;
-    font-size: 22px;
-}
-
-h6 {
-    font-size: 24px;
-}
-
-h5 {
-    font-size: 24px;
-}
-
-h4 {
-    font-size: 28px;
-}
-
-h3 {
-    font-size: 32px;
-}
-
-h2 {
-    font-size: 36px;
-}
-
-h1 {
-    font-size: 40px;
-}
-
-a {
-    position: relative;
-    color: var(--text);
-    font-size: 20px;
-    text-decoration: none;
-}
-
-ul > li {
-    display: block;
-    margin: 0;
-    padding: 0;
-}
-
-a:visited {
-    text-decoration: none;;
-}
-
-body, html {
-    height: auto;
-    margin: 0px;
-    background-color: var(--background);
-}
-  
-* {
-    box-sizing: border-box;
-    scroll-behavior: smooth;
+    --blue-bright-opaque: rgba(64, 64, 260, 0.5);
 }
 
 
-p.small {
-    font-size: 16px;
-    font-style: italic;
+/* ANIMATION DEFINITIONS */
+@keyframes fa-beat-hover {
+    from { transform: scale(1); }
+    to { transform: scale(1.125); }
 }
 
-
-#name-notifier,
-#email-notifier-length,
-#email-notifier-regex,
-#subject-notifier,
-#message-notifier {
-    color: var(--red);
-}
-
-#submit-notifier {
-    animation: shake 0.15s ease-in-out 0s 2;
-    display: block;
-    text-align: center;
-    margin-bottom: 100px;
-}
 
 @keyframes shake {
     0% {transform: translateX(0);}
@@ -137,360 +33,6 @@ p.small {
     100% {transform: translateX(0px);}
 }
 
-
-svg {
-    position: absolute;
-    height: 100vh;
-    width: 100vw;
-}
-
-
-path {
-    fill: none;
-    stroke: var(--text-back);
-    border: 0;
-}
-  
-.bg-image {
-    filter: blur(2px);
-    -webkit-filter: blur(2px);
-
-    height: 100vh;
-}
-
-.bg-text {
-    background-color: var(--content-opaque);
-    color: var(--text);
-    border-radius: 5px;
-    font-weight: bold;
-    border: 3px solid var(--text-back);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    width: min(800px, 90vw);
-    text-align: center;
-    padding: 15px;
-}
-
-
-#bg-name {
-    margin: 0;
-    font-size: 52px;
-    font-variant: small-caps;
-    font-weight: 500;
-    padding: 5px 30px;
-    border-bottom: 1px solid var(--text-back);
-}
-
-
-#name-light {
-    font-weight: 250;
-}
-
-ul.bg-list {
-    padding: 0;
-    margin: 0;
-}
-
-ul.bg-list > li {
-    display: inline;
-    padding: 0 5px;
-    margin: 0;
-    font-size: 24px;
-}
-
-
-.content-container {
-    text-align: center;
-    background-image: linear-gradient(var(--background) 50px, var(--content) 100px);
-    width: 61.8034%;
-    margin: 0 auto;
-    padding: 100px 40px 40px 40px;
-}
-
-#project-grid {
-    display: grid;
-    gap: 30px;
-    width: 100%;
-    height: 100%;
-    grid-template-columns: repeat(1, min(100%, 900px));
-    justify-content: center;
-}
-
-#project-grid > div {
-    display: inline-block;
-    text-align: justify;
-
-    border: 1px solid var(--text-back);
-    border-radius: 10px;
-    background-color: var(--dark);
-    padding: 10px 20px;
-}
-
-#project-grid > div > ul {
-    margin: 0;
-    padding: 0;
-}
-
-
-.text-under {
-    padding-left: 30px;
-    padding-right: 30px;
-    border-bottom: 1px solid var(--text-back);
-}
-
-
-a.pretty-link::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    border-radius: 4px;
-    background-color: var(--red);
-    bottom: 0;
-    transform: scaleX(0);
-    transition: transform .3s ease-in-out;
-}
-
-a.pretty-link:hover::before {
-    transform-origin: left;
-    transform: scaleX(1);
-}
-
-
-form {
-    text-align: left;
-}
-
-label {
-    margin: 0;
-}
-
-input[type=text],
-textarea {
-    width: min(600px, 100%);
-    padding: 12px 20px;
-    font-size: 20px;
-    border-radius: 10px;
-    outline: 0;
-    border: 1px solid var(--text-back);
-    background-color: var(--form-input);
-    color: var(--text);
-}
-
-input[type=button] {
-    width: min(100px, 100%);
-    margin-top: 10px;
-    padding: 6px;
-    font-size: 20px;
-    border-radius: 10px;
-    outline: 0;
-    border: 1px solid var(--text-back);
-    background-color: var(--form-input);
-    color: var(--text);
-    cursor: pointer;
-}
-
-
-header {
-    /* Stick header to top of site */
-    position: sticky;
-    top: 0;
-    width: 100%;
-    background-color: var(--content);
-    z-index: 999;
-
-    /* 2 Row grid for main-header and progress bar */
-    display: grid;
-    grid-template-columns: 535px 100px auto 150px 150px 150px;
-    grid-template-rows: 70px 10px;
-    grid-template-areas: 
-        "hname hsocial hspace hprojects habout hcontact"
-        "pbar pbar pbar pbar pbar pbar";
-
-    row-gap: 0;
-    column-gap: 10px;
-}
-
-header > div#header-name,
-header > div#header-social,
-header > div#header-space,
-header > div#header-projects,
-header > div#header-about,
-header > div#header-contact {
-    text-align: center;
-    margin: auto;
-}
-
-header > div#header-name {
-    grid-area: hname;
-    padding-left: 20px;
-}
-
-header > div#header-social {
-    grid-area: hsocial;
-}
-
-div#header-social > ul {
-    color: var(--text);
-    margin: 0;
-}
-
-header > div#header-space {
-    grid-area: hspace;
-}
-
-header > div#header-projects {
-    grid-area: hprojects;
-}
-
-header > div#header-about {
-    grid-area: habout;
-}
-
-header > div#header-contact {
-    grid-area: hcontact;
-}
-
-header > div#header-progress {
-    grid-area: pbar;
-    border-top: 1px solid var(--text-back);
-    border-bottom: 1px solid var(--text-back);
-}
-
-div#header-progress-inner {
-    background-color: var(--blue);
-    height: 100%;
-}
-
-.article {
-    /* Grid containing article navigation and main article */
-    display: grid;
-    grid-template-columns: 2.5fr 61.8034% 1fr;
-    grid-template-areas: "anav acontent aspace";
-}
-
-.article > div#article-navigation {
-    grid-area: anav;
-}
-
-div#article-navigation div {
-    position: sticky;
-    top: max(25%, 100px);
-    max-height: 61.8034vh;
-    
-    background-color: var(--content);
-    border: 1px solid var(--text-back);
-    border-radius: 10px;
-    margin: 30px;
-}
-
-div#article-navigation > div {
-    overflow-y: auto;
-    overflow: scroll;
-    text-align: center;
-}
-
-
-.article > div#article-content {
-    grid-area: acontent;
-    background-color: var(--content);
-    text-align: justify;
-    background-image: linear-gradient(var(--background) 50px, var(--content) 100px);
-    padding: 100px 40px 40px 40px;
-}
-
-.article > div#article-space {
-    grid-area: aspace;
-}
-
-
-ol#table-of-contents {
-    padding: 0 0 0 2px;
-    text-align: left;
-    margin: 10px;
-    list-style-type: none;
-}
-
-ol#table-of-contents > li {
-    color: var(--text);
-    font-style: italic;
-    font-size: 18px;
-    border-left: 10px solid var(--red);
-    margin: 10px;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-ol#table-of-contents > ol#table-of-contents > li {
-    display: block;
-    color: var(--text);
-    font-style: italic;
-    font-size: 1px;
-    border-left: 10px solid var(--red);
-    margin: 10px 10px 10px 20px;
-}
-
-ol#table-of-contents > li:hover {
-    transition: background-color;
-    transition-duration: 0.5s;
-    transition-timing-function: ease-in-out;
-    background-color: var(--red-opaque);
-}
-
-ol#table-of-contents > li:not(:hover) {
-    transition: background-color;
-    transition-duration: 0.5s;
-    transition-delay: 0.2s;
-    transition-timing-function: ease-in-out;
-    background-color: var(--content);
-}
-
-ol#table-of-contents > li > a {
-    display: block;
-    height: 100%;
-    width: 100%;
-}
-
-p#toc-title {
-    display: inline-block;
-    font-size: 20px;
-    color: white;
-    text-align: center;
-    border-bottom: 1px solid var(--text-back);
-    padding: 0px 15px;
-    margin-top: 10px;
-    margin-bottom: 0;
-}
-
-div#article-content > h2,
-div#article-content > h3 {
-    border-bottom: 2px solid rgba(0, 0, 0, 0);
-}
-
-div#article-content > h2:target,
-div#article-content > h3:target {
-    transition: border-bottom;
-    transition-duration: 0.5s;
-    transition-delay: 0.2s;
-    transition-timing-function: ease-in-out;
-    border-bottom: 2px solid var(--red);
-}
-
-#project-title {
-    margin-bottom: 0;
-}
-
-#project-date {
-    margin-top: 0;
-}
-
-
-div:hover > #project-title {
-    animation: glow 0.30s ease-in-out 0.1s 1 forwards;
-}
 
 @keyframes glow {
     from {
@@ -509,11 +51,471 @@ div:hover > #project-title {
 }
 
 
+/* General page options */
+* {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+
+body, html {
+    height: auto;
+    margin: 0px;
+    background-color: var(--background)
+}
+  
+
+/* Social media icon hover "beating" effect */
+.fa-beat-hover:hover {
+    animation:fa-beat-hover 0.75s ease infinite;
+    animation-direction: alternate;
+  }
+
+
+/* General heading options */
+h1, h2, h3, h4, h5, h6 {
+    display: inline-block;
+    color: var(--text);
+    scroll-margin-top: 100px;
+    margin: 10px 0;
+    text-align: left;
+}
+
+
+/* Ensure links inherit from their parent */
+h1 > a,
+h2 > a,
+h3 > a,
+h4 > a,
+h5 > a,
+h6 > a,
+p > a {
+    font-size: inherit;
+    font-style: inherit;
+    font-weight: inherit;
+    margin: inherit;
+    padding: inherit;
+}
+
+
+/* Text options */
+p {
+    font-size: 20px;
+    line-height: 150%;
+    text-align: justify;
+    color: var(--text);
+    font-size: 22px;
+}
+
+
+/* Individual Heading font sizes */
+h6 { font-size: 20px; }
+h5 { font-size: 22px; }
+h4 { font-size: 24px; }
+h3 { font-size: 28px; }
+h2 { font-size: 36px; }
+h1 { font-size: 40px; }
+
+
+/* Hyperlink options*/
+a {
+    position: relative;
+    color: var(--text);
+    font-size: 20px;
+    text-decoration: none;
+}
+
+
+/* Standard list options */
+ul > li {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Notification messages for invalid form fields*/
+#name-notifier,
+#email-notifier-length,
+#email-notifier-regex,
+#subject-notifier,
+#message-notifier {
+    color: var(--red);
+    font-size: 16px;
+    font-style: italic;
+}
+
+
+/* Notification determining whether the form submission if valid or invalid */
+#submit-notifier {
+    animation: shake 0.15s ease-in-out 0s 2;
+    display: block;
+    text-align: center;
+    margin-bottom: 100px;
+}
+
+
+
+/* Main page site background image */
+.bg-image {
+    background-image: url("/assets/index.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 100vh;
+    filter: blur(0.5px);
+    -webkit-filter: blur(0.5px);
+}
+
+
+/* Name, projects, contacts, and abouts page banner */
+.bg-text {
+    background-color: var(--background-opaque);
+    color: var(--text);
+    border-radius: 10px;
+    font-weight: bold;
+    border: 3px solid var(--text-back);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    width: min(800px, 90vw);
+    text-align: center;
+    padding: 15px;
+}
+
+
+/* Format name properly */
+#bg-name {
+    margin: 0;
+    font-size: 52px;
+    font-variant: small-caps;
+    font-weight: 500;
+    padding: 5px 30px;
+    border-bottom: 1px solid var(--text-back);
+}
+
+
+/* Apply a lighter font weight to the first name */
+#name-light {
+    font-weight: 250;
+}
+
+
+/* Ensure site list lacks spacing */
+ul.bg-list {
+    padding: 0;
+    margin: 0;
+}
+
+
+/* Ensure each list item is inline (horizontal rather than vertical) */
+ul.bg-list > li {
+    display: inline;
+    padding: 0 5px;
+    margin: 0;
+    font-size: 24px;
+}
+
+
+/* Show what content our site divs hold */
+.content-container {
+    text-align: center;
+    width: 61.8034%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+
+/* Draw a border around the about section */
+#about-container {
+    border: 1px solid var(--text-back);
+    padding: 10px 30px;
+    border-radius: 20px;
+}
+
+
+/* Establish a grid layout for each project */
+#project-grid {
+    display: grid;
+    margin-top: 30px;
+    gap: 30px;
+    width: 100%;
+    height: 100%;
+    grid-template-columns: repeat(1, min(100%, 900px));
+    justify-content: center;
+}
+
+
+/* Ensure grid content is formatted properly */
+#project-grid > div {
+    display: inline-block;
+    text-align: justify;
+    border: 1px solid var(--text-back);
+    border-radius: 10px;
+    background-color: var(--nero);
+    padding: 10px 20px;
+}
+
+
+/* Remove indentation for project contents (Title, Date, Synopsis) */
+#project-grid > div > ul {
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Add an underline to each section of the main page */
+.text-under {
+    padding-left: 30px;
+    padding-right: 30px;
+    border-bottom: 1px solid var(--text-back);
+}
+
+
+/* Hyperlink red highlight effect */
+a.pretty-link::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background-color: var(--red);
+    bottom: 0;
+    transform: scaleX(0);
+    transition: transform .3s ease-in-out;
+}
+
+a.pretty-link:hover::before {
+    transform-origin: left;
+    transform: scaleX(1);
+}
+
+
+/* FORM CONFIG */
+#form-contact { text-align: left; }
+#form-contact-container {
+    display: inline-block;
+    margin: 0 auto;
+}
+
+form > ul {
+    margin: 0;
+    padding: 0;
+}
+
+input[type=text],
+textarea {
+    width: min(600px, 100%);
+    padding: 12px 20px;
+    font-size: 20px;
+    border-radius: 10px;
+    outline: 0;
+    border: 1px solid var(--text-back);
+    background-color: var(--nero-light);
+    color: var(--text);
+}
+
+
+input[type=button] {
+    width: min(100px, 100%);
+    margin-top: 10px;
+    padding: 6px;
+    font-size: 20px;
+    border-radius: 10px;
+    outline: 0;
+    border: 1px solid var(--text-back);
+    background-color: var(--nero-light);
+    color: var(--text);
+    cursor: pointer;
+}
+
+
+/* PROJECT CONFIG */
+header {
+    /* Stick header to top of site */
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    background-color: var(--black-russian);
+    z-index: 999;
+
+    /* 2 Row grid for main-header and progress bar */
+    display: grid;
+    grid-template-columns: max-content max-content auto max-content max-content max-content;
+    grid-template-rows: 70px 10px;
+    grid-template-areas: 
+        "hname hsocial hspace hprojects habout hcontact"
+        "pbar pbar pbar pbar pbar pbar";
+
+    row-gap: 0;
+    column-gap: 40px;
+}
+
+
+header > div#header-name,
+header > div#header-social,
+header > div#header-space,
+header > div#header-projects,
+header > div#header-about,
+header > div#header-contact {
+    margin: auto;
+}
+
+header > div#header-name {
+    grid-area: hname;
+    padding-left: 40px;
+}
+
+header > div#header-social { grid-area: hsocial; }
+
+div#header-social > ul {
+    color: var(--text);
+    margin: 0;
+    padding: 0;
+}
+
+header > div#header-space { grid-area: hspace; }
+header > div#header-projects { grid-area: hprojects; }
+header > div#header-about { grid-area: habout; }
+header > div#header-contact {
+    grid-area: hcontact;
+    padding-right: 40px;
+}
+
+
+/* Header progress bar */
+header > div#header-progress {
+    grid-area: pbar;
+    border-top: 1px solid var(--text-back);
+    border-bottom: 1px solid var(--text-back);
+}
+
+div#header-progress-inner {
+    background-color: var(--blue);
+    height: 100%;
+}
+
+
+/* Grid containing article navigation and main article */
+.article {
+    display: grid;
+    grid-template-columns: 2fr 61.8034% 1fr;
+    grid-template-areas: "anav acontent aspace";
+}
+
+
+.article > div#article-navigation {
+    grid-area: anav;
+    border-right: 1px solid var(--text-back);
+    background-color: var(--dark);
+}
+
+
+div#article-navigation div {
+    position: sticky;
+    top: 100px;
+    max-height: 100vh;
+}
+
+
+div#article-navigation > div {
+    overflow-y: auto;
+    overflow: scroll;
+    text-align: center;
+
+    margin-left: 10px;
+    border-left: 1px solid var(--text-back);
+}
+
+
+.article > div#article-content {
+    grid-area: acontent;
+    text-align: justify;
+    padding: 100px 40px 40px 40px;
+}
+
+
+.article > div#article-space { grid-area: aspace; }
+
+
+/* TOC Config */
+ol#table-of-contents {
+    padding-left: 20px;
+    text-align: left;
+    list-style-type: none;
+}
+
+ol#table-of-contents > li {
+    width: 100%;
+    margin: 0;
+    padding: 10px 0px 10px 10px;
+    border-left: 10px solid var(--red-opaque);
+}
+
+
+/* TOC hover effect */
+ol#table-of-contents > li:hover {
+    transition: background-color;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+    background-color: var(--red-opaque);
+}
+
+ol#table-of-contents > li:not(:hover) {
+    transition: background-color;
+    transition-duration: 0.5s;
+    transition-delay: 0.2s;
+    transition-timing-function: ease-in-out;
+    background-color: var(--dark);
+}
+
+ol#table-of-contents > li > a {
+    display: block;
+}
+
+p#toc-title {
+    font-size: 24px;
+    padding: 0px 15px;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+div#article-content > h2,
+div#article-content > h3 { border-bottom: 2px solid rgba(0, 0, 0, 0); }
+
+
+div#article-content > h2:target,
+div#article-content > h3:target {
+    transition: border-bottom;
+    transition-duration: 0.5s;
+    transition-delay: 0.2s;
+    transition-timing-function: ease-in-out;
+    border-bottom: 2px solid var(--red);
+}
+
+
+/* Main page project content config */
+#project-title { margin-bottom: 0; }
+#project-date {
+    margin-top: 0;
+    font-size: 16px;
+    font-style: italic;
+}
+
+
+div:hover > #project-title { animation: glow 0.30s ease-in-out 0.1s 1 forwards; }
+
+
+
+/* Simple blue-line underline */
 .simple-underline {
     border-bottom: 1.5px solid var(--blue-bright);
     font-style: italic;
 }
 
+
+/* Standard ordered list config */
 ol > li {
     color: var(--text);
     font-size: 20px;
@@ -521,9 +523,84 @@ ol > li {
 }
 
 
+/* Figure config for plotting */
 .figure {
     text-align: center;
     width: 100%;
     max-width: 100%;
     max-height: auto;
+}
+
+
+/* Table config */
+table, th, td {
+    color: white;
+}
+
+
+table {
+    border-collapse: collapse;
+    border-top: 1px solid var(--text-back);
+    width: 100%;
+}
+
+
+th, td {
+    border-bottom: 1px solid var(--text-back);
+    padding: 5px 10px;
+}
+
+
+th {
+    width: 50%;
+    font-size: 20px;
+    background-color: var(--nero);
+    font-weight: bold;
+    text-align: left;
+}
+
+
+/* Alternate table colors every other row; Add simple row hover effect */
+tr:nth-child(odd) { background-color: var(--nero-light); }
+tr:nth-child(even) { background-color: var(--nero); }
+tr:hover { background-color: var(--blue-bright-opaque); }
+
+
+td {
+    max-width: 0px;
+    overflow: hidden;
+    text-overflow: "...";
+    white-space: nowrap;
+    color: var(--text-back);
+}
+
+
+td:hover {
+    color: var(--text);
+    text-overflow: "";
+}
+
+
+/* ERROR CODE FORMATTING */
+.content-error {
+    width: fit-content;
+    text-align: center;
+    background-color: var(--nero);
+
+    border: 1px solid var(--text-back);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10% auto;
+}
+
+
+.content-error > p {
+    text-align: center;
+    margin-bottom: 0;
+}
+
+
+.content-error > h1 {
+    border-bottom: 1px solid var(--text-back);
+    padding: 10px;
 }
