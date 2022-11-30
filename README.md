@@ -28,16 +28,16 @@ To deploy the web server locally, we use [Uvicorn](https://www.uvicorn.org/) but
 pip install uvicorn
 ```
 
-To begin development on the project, we can simply call uvicorn on `project-template/app/main.py`:
+To begin development on the project, we can simply call uvicorn on `project-template/app/app.py`:
 
 ```bash
-uvicorn main:app --reload
+uvicorn app:app --reload
 ```
 
 The `--reload` flag ensures that the API is restarted whenever a change is made in the repository. This helps to track immediate changes to the application. When the API is complete, however, it is preferable to run Uvicorn without the `--reload` flag:
 
 ```bash
-uvicorn main:app --host='localhost' --port='8000'
+uvicorn app:app --host='localhost' --port='8000'
 ```
 
 ## Project Development
@@ -62,7 +62,6 @@ When working on a project, there are a few considerations to keep in mind. Consi
 ├── README.md
 └── src
     └── main.py
-/
 ```
 
 Each sibling directory is meant to serve its own purpose:
