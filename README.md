@@ -6,7 +6,7 @@ We provide a [FastAPI](https://fastapi.tiangolo.com/) backend, which is connecte
 
 This template is incomplete and is subject to heavy change in the upcoming weeks or months. As such, usage is limited.
 
-## Usage
+## Installation and Usage
 
 To use the _Project Template_, begin by forking or cloning the repository with SSH or HTTPS:
 
@@ -45,40 +45,30 @@ uvicorn main:app --host='localhost' --port='8000'
 When working on a project, there are a few considerations to keep in mind. Consider the repository file structure below:
 
 ```bash
-./project-template/app
-├── __init__.py
-├── main.py
-├── README.md
-├── scripts
-│   ├── progress-bar.js
-│   └── table-of-contents.js
-├── static
-│   └── styles.css
-└── templates
-    └── projects
-        ├── project.html
-        └── template.html
-```
-
-`main.py` is the primary location of the Python API: our project back-end. This contains all API routing information and is meant to be utilized for interfacing with project models, visualizations, or results.
-
-`main.py` also maintains a path to our front-end HTML: `templates/projects/project.html`. Here, you can build interfaces to show-case, explain, and interact with your project. The HTML connects to the CSS style sheet found in `static/styles.css` and utilizes simple JavaScript functionality found in `scripts/*`.
-
-It is important to note that `main.py` is best used as the API router. Separate application code can be created elsewhere. For instance, if you have a series of Python scripts encapsulating a machine-learning pipeline, it would be preferable to store them together as a sibling of the `/app` directory:
-
-```bash
-.
+./project-template
 ├── app
-│   └── ...
-│
-├── pipeline
-│   ├── data-exploration.py
-│   ├── data-ingestion.py
-│   ├── data-preprocess.py
+│   ├── app.py
+│   ├── html
+│   │   ├── index.html
+│   │   └── template.html
 │   ├── __init__.py
-│   ├── models.py
-│   └── pipeline.ipynb
-└── README.md
+│   ├── scripts
+│   │   ├── progress-bar.js
+│   │   └── table-of-contents.js
+│   └── static
+│       └── styles.css
+├── data
+├── models
+├── README.md
+└── src
+    └── main.py
+/
 ```
 
-Pipeline functions can then be directly called within the API to process requests, avoding a cluttered `main.py`.
+Each sibling directory is meant to serve its own purpose:
+
+- `app` is the directory containing our local FastAPI application. It is a pruned version of the full application found on my [personal site](https://gitlab.com/ahlbrecht-machine-learning/site). Thus, it is meant to allow the user to preview work with HTML and CSS styling as it would be viewed online.
+  - To view changes, launch the application with Uvicorn and edit `app/html/index.html`.
+- `data` is meant to hold training data used in data analysis, visualization, or model training.
+- `models` can be used to physically store machine-learning models. If you wish to deploy models as a docker image, I recommend dockerizing the model and utilizing [Typer](https://typer.tiangolo.com/) to interface with it from the command line.
+- `src` is where project development occurs. `main.py` is the main interface for our machine-learning application.
