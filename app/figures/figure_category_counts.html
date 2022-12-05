@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .error {
+        color: red;
+      }
+    </style>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm//vega@5"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm//vega-lite@4.17.0"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm//vega-embed@6"
+    ></script>
+  </head>
+  <body>
+    <div id="vis"></div>
+    <script>
+      (function (vegaEmbed) {
+        var spec = {
+          config: {
+            arc: { fill: "#537eff" },
+            area: { fill: "#537eff" },
+            circle: { fill: "#537eff", stroke: "#FFFFFF", strokeWidth: 0.5 },
+            bar: { fill: "#537eff", stroke: "#FFFFFF", strokeWidth: 0.5 },
+            line: { stroke: "#537eff" },
+            path: { stroke: "#537eff" },
+            point: { stroke: "#537eff" },
+            rect: { fill: "#537eff", stroke: "#FFFFFF", strokeWidth: 0.5 },
+            shape: { stroke: "#537eff" },
+            symbol: { fill: "#537eff" },
+            title: {
+              font: "IBM Plex Mono",
+              color: "#FFFFFF",
+              fontSize: 22.5,
+              anchor: "start",
+            },
+            axis: {
+              titleFont: "IBM Plex Mono",
+              titleColor: "#FFFFFF",
+              titleFontSize: 14.4,
+              labelFont: "IBM Plex Mono",
+              labelColor: "#FFFFFF",
+              labelFontSize: 14.4,
+              gridColor: "#FFFFFF",
+              gridOpacity: 0.5,
+              domainColor: "#FFFFFF",
+              tickColor: "#FFFFFF",
+            },
+            header: {
+              labelFont: "IBM Plex Mono",
+              titleFont: "IBM Plex Mono",
+              color: "#FFFFFF",
+              labelColor: "#FFFFFF",
+              titleColor: "#FFFFFF",
+              labelFontSize: 18,
+              titleFontSize: 18,
+            },
+            legend: {
+              titleFont: "IBM Plex Mono",
+              titleColor: "#FFFFFF",
+              titleFontSize: 14.4,
+              labelFont: "IBM Plex Mono",
+              labelColor: "#FFFFFF",
+              labelFontSize: 14.4,
+            },
+            range: {
+              category: [
+                "#537eff",
+                "#00cb85",
+                "#eeeeee",
+                "#00e3ff",
+                "#e935a1",
+                "#e1562c",
+                "#efe645",
+              ],
+              diverging: [
+                "#537eff",
+                "#00cb85",
+                "#eeeeee",
+                "#00e3ff",
+                "#e935a1",
+                "#e1562c",
+                "#efe645",
+              ],
+              heatmap: ["#161618", "#FFFFFF"],
+              ramp: ["#161618", "#FFFFFF"],
+              ordinal: ["#161618", "#FFFFFF"],
+            },
+            background: "#161618",
+            type: "fit",
+          },
+          data: { name: "data-58bb700763ba9252530bbfd5fc3cbd98" },
+          mark: "bar",
+          encoding: {
+            color: { field: "Keep", sort: [true, false], type: "nominal" },
+            tooltip: [
+              { field: "Category", type: "nominal" },
+              { field: "Frequency", type: "quantitative" },
+              { field: "Keep", type: "nominal" },
+            ],
+            x: { field: "Frequency", type: "quantitative" },
+            y: { field: "Category", sort: "-x", type: "nominal" },
+          },
+          width: 400,
+          $schema: "https://vega.github.io/schema/vega-lite/v4.17.0.json",
+          datasets: {
+            "data-58bb700763ba9252530bbfd5fc3cbd98": [
+              { Category: "Politics", Frequency: 32739, Keep: true },
+              { Category: "Wellness", Frequency: 17827, Keep: true },
+              { Category: "Entertainment", Frequency: 16058, Keep: true },
+              { Category: "Travel", Frequency: 9887, Keep: true },
+              { Category: "Style & beauty", Frequency: 9649, Keep: true },
+              { Category: "Parenting", Frequency: 8677, Keep: true },
+              { Category: "Healthy living", Frequency: 6694, Keep: true },
+              { Category: "Queer voices", Frequency: 6314, Keep: true },
+              { Category: "Food & drink", Frequency: 6226, Keep: true },
+              { Category: "Business", Frequency: 5937, Keep: true },
+              { Category: "Comedy", Frequency: 5175, Keep: true },
+              { Category: "Sports", Frequency: 4884, Keep: false },
+              { Category: "Black voices", Frequency: 4528, Keep: false },
+              { Category: "Home & living", Frequency: 4195, Keep: false },
+              { Category: "Parents", Frequency: 3955, Keep: false },
+              { Category: "The worldpost", Frequency: 3664, Keep: false },
+              { Category: "Weddings", Frequency: 3651, Keep: false },
+              { Category: "Women", Frequency: 3490, Keep: false },
+              { Category: "Impact", Frequency: 3459, Keep: false },
+              { Category: "Divorce", Frequency: 3426, Keep: false },
+              { Category: "Crime", Frequency: 3405, Keep: false },
+              { Category: "Media", Frequency: 2815, Keep: false },
+              { Category: "Weird news", Frequency: 2670, Keep: false },
+              { Category: "Green", Frequency: 2622, Keep: false },
+              { Category: "Worldpost", Frequency: 2579, Keep: false },
+              { Category: "Religion", Frequency: 2556, Keep: false },
+              { Category: "Style", Frequency: 2254, Keep: false },
+              { Category: "Science", Frequency: 2178, Keep: false },
+              { Category: "World news", Frequency: 2177, Keep: false },
+              { Category: "Taste", Frequency: 2096, Keep: false },
+              { Category: "Tech", Frequency: 2082, Keep: false },
+              { Category: "Money", Frequency: 1707, Keep: false },
+              { Category: "Arts", Frequency: 1509, Keep: false },
+              { Category: "Fifty", Frequency: 1401, Keep: false },
+              { Category: "Good news", Frequency: 1398, Keep: false },
+              { Category: "Arts & culture", Frequency: 1339, Keep: false },
+              { Category: "Environment", Frequency: 1323, Keep: false },
+              { Category: "College", Frequency: 1144, Keep: false },
+              { Category: "Latino voices", Frequency: 1129, Keep: false },
+              { Category: "Culture & arts", Frequency: 1030, Keep: false },
+              { Category: "Education", Frequency: 1004, Keep: false },
+            ],
+          },
+        };
+        var embedOpt = { mode: "vega-lite" };
+
+        function showError(el, error) {
+          el.innerHTML =
+            '<div class="error" style="color:red;">' +
+            "<p>JavaScript Error: " +
+            error.message +
+            "</p>" +
+            "<p>This usually means there's a typo in your chart specification. " +
+            "See the javascript console for the full traceback.</p>" +
+            "</div>";
+          throw error;
+        }
+        const el = document.getElementById("vis");
+        vegaEmbed("#vis", spec, embedOpt).catch((error) =>
+          showError(el, error)
+        );
+      })(vegaEmbed);
+    </script>
+  </body>
+</html>

@@ -1,17 +1,960 @@
 {% extends "template.html" %} {% block content %}
-<h2 id="Hello World">Hello World</h2>
+<h2 id="Contextual Advertising using Machine- and Deep-Learning">
+  Contextual Advertising using Machine- and Deep-Learning
+</h2>
+
+<div class="model-widget">
+  <form action="">
+    <label for="input-text">Input Text:</label>
+    <input type="text" id="text" name="text">
+    <input type="submit" value="Predict Category">
+    <div class="result"></div>
+  </form>
+  <table class="model-results">
+    <tr>
+      <th>Category</th>
+      <th>Probability</th>
+    </tr>
+    <tr>
+      <td>Politics</td>
+      <td id="model-results-politics"></td>
+    </tr>
+    <tr>
+      <td>Wellness</td>
+      <td id="model-results-wellness"></td>
+    </tr>
+    <tr>
+      <td>Entertainment</td>
+      <td id="model-results-entertainment"></td>
+    </tr>
+    <tr>
+      <td>Travel</td>
+      <td id="model-results-travel"></td>
+    </tr>
+    <tr>
+      <td>Style & Beauty</td>
+      <td id="model-results-style-beature"></td>
+    </tr>
+    <tr>
+      <td>Parenting</td>
+      <td id="model-results-parenting"></td>
+    </tr>
+    <tr>
+      <td>Healthy Living</td>
+      <td id="model-results-healthy-living"></td>
+    </tr>
+    <tr>
+      <td>Queer Voices</td>
+      <td id="model-results-queer-voices"></td>
+    </tr>
+    <tr>
+      <td>Food & Drink</td>
+      <td id="model-results-food-drink"></td>
+    </tr>
+    <tr>
+      <td>Business</td>
+      <td id="model-results-business"></td>
+    </tr>
+    <tr>
+      <td>Comedy</td>
+      <td id="model-results-comedy">Helklo!</td>
+    </tr>
+  </table>
+</div>
+
+<div class="takeaways">
 <p>
-  This file serves as a template for a project's front-end. It inherits the CSS
-  styling and file structure of the main site projects. This is done to
-  eventually facilitate project integration into the main site. H2 and H3
-  headings will be automatically recorded in the table-of-contents according to
-  the heading's tag identifier. Interactive elements can be added by interacting
-  with the underlying API located at project-template/app/main.py. The Jinja2
-  templating engine is used to inherit the template.html file and styles are
-  linked from project-template/app/static/styles.css. Each project-template is
-  designed to served as a single Docker container, which will be implemented
-  into the main site via docker-compose, docker-swarm, or another container
-  orchestration software. Thus, each project (it's front-end, models, and API
-  back-end) is served as a micro-service within the main project site.
+  <b>Key Takeaways:</b>
+  <ul>
+    <li>
+      Contextual advertising has a goal of extracting catgegories from text
+      based on its context.
+    </li>
+    <li>
+      We compare the performance and interpretability of classical machine
+      learning models and a DistilBERT model
+    </li>
+    <li>Test</li>
+  </ul>
 </p>
+</div>
+
+
+<p>
+  <a
+    href="https://en.wikipedia.org/wiki/Contextual_advertising"
+    class="simple-underline"
+    >Contextual Advertising</a
+  >
+  describes the process of targeting advertisements to users based on the
+  context of a given website's contents. For instance, if we have a user
+  particularly interested in sports and medicine, we would want to recommend
+  them articles in the fields of sports, medicine, and likely closely-related
+  fields such as sports-medicine. Thus, given only the context given by a
+  collection of sites, how can we target individual users with content that
+  aligns with their interests?
+</p>
+
+<p>
+  Here, we tackle this issue using a variety of machine- and deep-learning
+  models. Decision Trees, Random Forests, and Multinomial Logistic Regression
+  are utilized to make contextual advertising decisions based on pre-processed
+  text data. These can be analytically beneficial if we wish to better
+  understand the key words that influence the context of a website or article.
+  While classic machine-learning methods are powerful, we can utilize
+  pre-embeded word vectors in a process called
+  <a
+    href="https://en.wikipedia.org/wiki/Transfer_learning"
+    class="simple-underline"
+    >Transfer Learning</a
+  >
+  to build more powerful models with a stronger understanding of language at the
+  expense of interpretability. We use
+  <a href="https://github.com/amaiya/ktrain" class="simple-underline"
+    ><code>ktrain</code></a
+  >
+  to perform text classification with 
+  <a href="https://arxiv.org/abs/1910.01108" class="simple-underline"
+    >DistilBERT</a
+  >.
+</p>
+
+<h2 id="Data Ingestion and Preprocessing">Data Ingestion and Preprocessing</h2>
+<p>
+  Our data comes from Rishabh Misra's
+  <a
+    href="https://www.kaggle.com/datasets/rmisra/news-category-dataset"
+    class="simple-underline">News Category Dataset</a>.
+  Importantly, it contains the <code>Category</code>, <code>Headline</code>, and
+  <code>Short Description</code> of approximately 210,000 news articles from
+  <a href="https://www.huffpost.com/" class="simple-underline">HuffPost</a>.
+  Using this information, we attempt to build a model to predict the new's
+  <code>Category</code> based on the <code>Headline</code> and <code>Short
+  Description</code>.
+  The classical machine-learning approach requires us to pre-process the text
+  data in a series of steps:
+  <ol>
+    <li>
+      <b>Text Tokenization</b> concerns splitting the text in a corpus of
+      of documents into a list of meaningful tokens. This is commonly used to
+      extract features in text such as words, Twitter mentions
+      (<code>@...</code>), or hashtags (<code>#...</code>). Naturally
+      uninformative parts of text can be thrown away. This often includes
+      punctuation markers (e.g., <code>!?.,;</code>), articles
+      (<code>the</code>, <code>a</code>, <code>an</code>), or numbers.
+    </li>
+    <li>
+      <b>Text Lemmatization</b> serves as a way to extract the most useful
+      information and reduce the feature space of each text vector. In text
+      lemmatization, we carry the assumption that each word has a strong
+      semantic relationship to its base word. This means we can replace the
+      occurence of words like <code>cats</code>, <code>cat's</code>, or
+      <code>cats'</code> with the singular <code>cat</code>.
+    </li>
+    <li>
+      <b>Text Vectorization</b> is a way of transforming the contents of a
+      document into a vector (list) of numbers. For example, a simple count
+      vectorizer assigns each word in a corpus an integer index, then counts
+      each individual occurence of those words in a document.
+    </li>
+  </ol>
+</p>
+
+<h3 id="Data Preprocessing">Data Preprocessing</h3>
+<p>
+  Before we begin working, we must first import the necessary libraries.
+  Importantly, we use <code>pandas</code> and <code>numpy</code> to manipulate
+  our data, <code>nltk</code> to perform our text preprocessing,
+  various <code>sklearn</code> modules to finish text processing and for
+  classical machine learning. <code>ktrain</code> abstracts
+  <code>tensorflow</code> to help us leverage transformer models easier. Below
+  is the entire importing preamble:
+</p>
+
+<pre><code class="language-python">
+# I/O capabilities
+import os
+
+# Arrays and DataFrames
+import numpy as np
+import pandas as pd
+
+# Natural language pre-processing
+import nltk
+nltk.download('omw-1.4')
+
+# Machine learning pre-processing
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
+
+# Machine learning models
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+
+# Model evaluation metrics
+from sklearn.metrics import classification_report, confusion_matrix
+
+# Plotting capabilities
+import matplotlib.pyplot as plt
+import altair as alt
+
+# Neural Networks
+import tensorflow as tf
+from tensorflow import keras
+
+# Abstraction over TensorFlow transformers
+import ktrain
+
+# Neural Networks
+import tensorflow as tf
+from tensorflow import keras
+
+# Type hints
+from typing import Optional, List
+</code></pre>
+
+<p>
+  Working in
+  <a href="https://hub.docker.com/r/kaggle/python" class="simple-underline">
+    Kaggle's Python environment
+  </a>,
+  we begin by reading in our dataset. Since we
+  are only concerned with extracting information from text, we work with only
+  the <code>Category</code>, <code>Headline</code>, and
+  <code>ShortDescription</code> columns. The <code>Headline</code> and
+  <code>ShortDescription</code> columns are concatenated together into a
+  single  <code>Text</code> column:
+</p>
+
+<pre><code class="language-python">
+# Set global variables
+DATA_DIR = "/kaggle/input/news-category-data"
+DATA_FNAME = os.path.join(DATA_DIR, "news_category_training_data.json")
+
+# Ingest dataset
+DATA = pd.read_json(DATA_FNAME)
+
+# Rename and extract necessary variables
+data = DATA[["category", "headline", "short_description"]]
+data.columns = ["Category", "Headline", "ShortDescription"]
+
+# Contacenate the headline and description into a single variable
+data["Text"] = data["Headline"] + " " + data["ShortDescription"]
+data = data[["Category", "Text"]]
+
+data["Category"] = data["Category"].map(str.capitalize)
+</code></pre>
+
+<p>
+  If we examine each the frequency of each category, we notice that there are
+  only 11 categories with more than 5,000 observations. To ensure our models can
+  have adequate power, we discard all but these 11 categories. While fewer than
+  5,000 observations may be valid for a binary classification problem, it brings
+  difficulties when we are trying to highlight distinct differences in over 40
+  total categories:
+</p>
+<div class="figure">
+  <div id="chart-category-counts"></div>
+  <p>
+    <b>Figure 1: </b>
+    Site category frequencies. Categories to be kept are marked in blue, while
+    categories that will be discarded due to insufficient sampling are marked in
+    green.
+  </p>
+</div>
+
+<pre><code language="python">
+def keep_column(frequency, cutoff:int=5_000) -> str:
+    if frequency < cutoff:
+        return False
+    
+    return True
+
+
+data_category_counts = pd.DataFrame(
+    data["Category"]
+    .value_counts()
+    .reset_index()
+)
+
+data_category_counts.columns = ["Category", "Frequency"]
+
+data_category_counts["Keep"] = (
+    data_category_counts["Frequency"]
+    .map(lambda x: keep_column(x, cutoff=5_000))
+)
+
+categories = data_category_counts.query("Keep == True")["Category"].to_list()
+data = data.query("Category in @categories")
+</code></pre>
+
+<h3 id="Text Tokenization">Text Tokenization</h3>
+<p>
+  We are now ready to preprocess the text in each observation. The first step in
+  this process is tokenizing the data. <code>nltk</code> provides some handy
+  methods to perform this task. First, we can define a list of
+  <em>stop words</em>, words or text features that we exclude from each entry.
+  Next, we define a <code>get_stop_words()</code> function that extends
+  <code>nltk</code>'s "english" stop words list to exclude numbers, punctuation,
+  special symbols, and URLs. We then tokenize the text by splitting text by
+  spaces, converting text into lowercase, and removing stop words:
+</p>
+<pre><code class="language-python">
+def get_stop_words() -> set:
+    """Retrieve a set of stop words built on top of the standard 'english' stop
+    words.
+    """
+    extended_words = []
+    extended_words.extend(list("123456789"))
+    extended_words.extend(list("!@#$%^&*()-_=+"))
+    extended_words.extend(["?", ".", ",", "!", "''", "'", "``", "’", ":"])
+    extended_words.extend(["'s", "'d", "'re"])
+    extended_words.extend(["http://", "https://"])
+    
+    stop_words = nltk.corpus.stopwords.words("english")
+    stop_words.extend(extended_words)
+    
+    return set(stop_words)
+
+
+def tokenize_text(text:str, stop_words:Optional[set]=None) -> List[str]:
+    """Tokenize text by standardizing case, removing special characters and
+    separating words in a given string.
+    """
+    text_tokenized = nltk.tokenize.word_tokenize(
+        text,
+        language="english"
+    )
+    text_tokenized = [word.lower() for word in text_tokenized]
+    
+    if stop_words is not None:
+        text_tokenized = [
+            word for word in text_tokenized
+            if word not in stop_words
+        ]
+        
+    return text_tokenized
+
+
+stop_words = get_stop_words()
+data["TextTokenized"] = data["Text"].map(lambda t: tokenize_text(t, stop_words))
+</code></pre>
+
+<h3 id="Text Lemmatization">Text Lemmatization</h3>
+<p>
+  <code>nltk</code> also provides a useful function to lemmative our text using
+  their <code>WordNetLemmatizer()</code>. By simplying applying this to each
+  tokenized text feature, we can significantly reduce the sparsity of our
+  corpus' vocabulary while maintaining a significant proportion of the original
+  information:
+</p>
+<pre><code language="python">
+lemmatizer = nltk.stem.WordNetLemmatizer()
+data["TextLemmatized"] = data["TextTokenized"].map(
+    lambda words: [lemmatizer.lemmatize(word) for word in words]
+) 
+</code></pre>
+
+<h3 id="Text Vectorization">Text Vectorization</h3>
+<p>
+  Now that we have generated our text tokens and reduced their feature space
+  using lemmatization, we are ready to vectorize each text example. Before text
+  vectorization, however, it is recommended to split the data into a training
+  and testing set so we can "learn" the vector representations of words from the
+  training data and apply it to any testing data or incoming observations. We
+  choose a 9:1 training:testing split. Our large sample size should allow us to
+  be reasonably confident when evaluating the testing data while still allowing
+  our training data to leverage a large number of observations to learn the
+  underlying distribution of the data:
+</p>
+<pre><code class="language-python">
+x = data["TextLemmatized"].to_list()
+
+# Reverse-tokenize the data for sklearn (TfidfVectorizer will re-tokenize)
+x = [" ".join(tokens) for tokens in x]
+
+y = data["Category"].to_list()
+
+x_train_text, x_test_text, y_train, y_test = train_test_split(
+    x, y,
+    train_size=0.9,
+    random_state=112358
+)
+</code></pre>
+
+<p>
+  To vectorize the data, we can make use of <code>sklearn</code>'s
+  <code>TfidfVectorizer()</code>. By fitting the model to our training data, we
+  can extract "transformed" versions of the text data:
+</p>
+<pre><code language="python">
+vectorizer = TfidfVectorizer(min_df=0.01, max_df=0.99)
+x_train = vectorizer.fit_transform(x_train_text)
+x_test = vectorizer.transform(x_test_text)
+</code></pre>
+
+<p>
+  Now that our text data is in vector format, it would be ideal to visualize our
+  vectors to determine if we can visually distinguish one from another. One idea
+  would be to create a simple heatmap representing the vector space of each
+  training observation. With a large vector space, however, this could be
+  difficult to interpret. A cleaner approach would be to project our vectors
+  into their principal components and plot the average statistics for each
+  category on a scatter plot. This would allow us to determine which categories
+  tend to cluster together and whether we can distinguish any two given
+  clusters. Since we are working with sparse matrices, we utilize
+  <code>sklearns</code>'s <code>TruncatedSVD()</code>.
+</p>
+
+<div class="figure">
+  <div id="chart-svd"></div>
+  <p>
+    <b>Figure 2:</b>
+    First 2 principal components of TF-IDF transformed training data vectors.
+    The size of each mark indicates uncertainty given by the standard deviation
+    of the given category. Although <code>Politics</code> and
+    <code>Comedy</code> are uncertain, their means are distinguished,
+    potentially making them easier to classify. 
+  </p>
+</div>
+
+<h2 id="Machine-Learning Models">Machine-Learning Models</h2>
+<p>
+  With tokenized, lemmatized, and vectorized data, we are now ready to build
+  some classical machine-learning models. For this, we will utilize decision
+  trees, random forests, and multinomial logistic regression:
+</p>
+<pre><code class="language-python">
+classifiers = {
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier(n_jobs=-1),
+    "Logistic Regression": LogisticRegression(
+        multi_class="multinomial",
+        max_iter=500,
+        n_jobs=-1,
+        warm_start=True
+  )
+}
+</code></pre>
+
+<h3 id="Evaluation Metrics">Evaluation Metrics</h3>
+<p>
+  Each model is evaluated based on its precision, recall, and F1-score:
+  <ul>
+    <li>
+      \(\text{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}\) denotes the
+      proportion of times the model correctly predicted a category given the
+      total number of <em>predictions</em> for that category. For example, if the model
+      correctly predicted the <code>Health & Wellness</code> category 59 times
+      but it predicted it 100 times in total, it would have a precision of 0.59.
+    </li>
+    <li>
+      \(\text{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}\) denotes the
+      proportion of times the model the model correctly predicted a category
+      given the total number of true observations for that category. For
+      example, if the model correctly predicted the
+      <code>Health & Wellness</code> category 40 times but there were a total of
+      100 true <code>Health & Welness</code> observations, it would have a
+      recall of 0.40.
+    </li>
+    <li>
+      \(\text{F}_1 = 2 \times \frac{\text{Precision} \times \text{Recall}}{\text{Precision} + \text{Recall}}\)
+      is the harmonic mean between precision and recall, attempting to balance
+      the two metrics.
+    </li>
+  </ul>
+  </p>
+
+  <p>
+  For our purposes, we will examine the \(\text{F}_1\) score. For future
+  analysis, however, it may be useful to provide increased weight towards the
+  recall metric because a user would likely prefer an article to be recommended
+  to them only if there is a high likelihood that it is actually one of their 
+  preferred categories. This can be generalized using a 
+  <a
+    href="https://en.wikipedia.org/wiki/F-score#F%CE%B2_score"
+    class="simple-underline">\(\text{F}_\beta\) score</a>.
+</p>
+<p>
+  Additionally, we will examine the confusion matrix for each observation. The
+  confusion matrix is normalized such that we divide by total number of true
+  observations.
+</p>
+<p>
+  Using the implementation of <code>confusion_matrix()</code> and
+  <code>classification_report()</code> in <code>sklearn</code>, we create a
+  function to help us evaluate each model concisely:
+</p>
+<pre><code class="language-python">
+def model_evaluation(y_true, y_pred, labels:Optional[set]=None) -> tuple:
+    """Evaluate a model, returning the confusion matrix and a classification
+    report.
+    
+    Args:
+        y_true (iterable): Labels representing the groud truth
+        y_pred (iterable): Labels predicted from a model
+        labels (Optional[set]): Labels corresponding to predictions. If None, we
+            take the intersection of the y_true and y_pred factors.
+        
+    Returns:
+        confusion_matrix (np.ndarray): Multi-label Confusion matrix in the form
+            of a NumPy array where a[i, j] represents the number of time class i
+            predicted class j.
+        classification_report (pd.DataFrame): A report of containing recall,
+            precision, F1 score, and accuracy metrics for each class.
+    """
+    
+    if labels is None:
+        labels = list(set(y_pred) | set(y_test))
+    
+    c_matrix = confusion_matrix(y_true, y_pred, labels=labels, normalize="true")
+    c_report = pd.DataFrame(classification_report(
+        y_true,
+        y_pred,
+        labels=labels,
+        output_dict=True
+    ))
+    
+    c_report = c_report.drop(labels="accuracy", axis=1)
+    c_report = c_report.drop(labels="support", axis=0)
+    
+    c_report.columns = [cname.capitalize() for cname in c_report.columns]
+    c_report.index = [iname.capitalize() for iname in c_report.index]
+    
+        
+    return (c_matrix, c_report, labels)
+</code></pre>
+
+<h3 id="Model Training & Evaluation">Model Training & Evaluation</h3>
+<p>
+  With our machine-learning models built and our evaluation metrics ready, we
+  can train our models by running each classifiers <code>fit()</code> method.
+  The model is evaluated on the testing data by generating predictions and a
+  confusion matrix and a classification report from each model. We begin by
+  fitting each model and storing their evaluation metrics in side the
+  <code>metrics</code> dictionary:
+</p>
+<pre><code class="language-python">
+metrics = {}
+for name, classifier in classifiers.items():
+    print(f"{name}...")
+    classifier.fit(x_train, y_train)
+    y_pred = classifier.predict(x_test)
+    
+    c_matrix, c_report, labels = model_evaluation(y_test, y_pred)
+    metrics[name] = ({
+        "c_matrix": c_matrix,
+        "c_report": c_report,
+        "labels": labels
+    })
+</code></pre>
+
+<p>
+  Each model performs relatively similar and have difficulties predicting the
+  <code>Business</code>, <code>Comedy</code>, and <code>Healthy Living</code>
+  categories, in particular. The most well-performing categories are
+  <code>Politics</code>, <code>Parenting</code>, and <code>Wellness</code>.
+</p>
+<div class="figure">
+  <div id="chart-ml-cmatrix"></div>
+  <p>
+    <b>Figure 3:</b>
+    Confusion matrices for the machine-learning models. Each category is
+    normalized as a proportion of the number of ground truth predictions to
+    better compare unbalanced classes.
+  </p>
+</div>
+
+<p>
+  To better compare the general performance of each model, we can examine model
+  performance metrics. We can see more clearly here that <code>Business</code>,
+  <code>Comedy</code>, and <code>Healthy Living</code> are the most difficult
+  classes for each classifier. <code>Politics</code> is classified the best
+  against each classifier. Overall, the multinomial logistic regression and
+  random forest are the most performant according to their weighted average
+  scores.
+</p>
+<div class="figure">
+  <div id="chart-ml-creport"></div>
+  <p>
+    <b>Figure 4:</b>
+    Classification reports for the machine-learning models. Precision, recall,
+    and the \(\text{F}_1\) score are evaluated for each individual category and
+    overall.
+  </p>
+</div>
+
+<h2 id="DistilBERT Model">DistilBERT Model</h2>
+<p>
+  While the classical machine-learning models perform correctly, on average,
+  there are far too many features and edge cases for them to learn the
+  underlying distribution. We can turn to transformer-based deep-learning
+  models in that case. Here, we use <code>ktrain</code> to train a DistilBERT
+  model to classify each category.
+</p>
+
+<p>
+  We can begin by loading a collection of texts from our a pandas
+  <code>DataFrame()</code>. <code>ktrain</code> has a helpful utility function
+  for this that will automatically split our data into a training and testing
+  set and produce a preprocessor in case we wish to process any future text
+  examples:
+</p>
+<pre><code class="language-python">
+data_train, data_test, preprocessor = ktrain.text.texts_from_df(
+    train_df=data,
+    text_column="Text",
+    label_columns=["Category"],
+    max_features=10_000,
+    maxlen=256,
+    val_pct=0.1,
+    ngram_range=1,
+    preprocess_mode="distilbert",
+    verbose=1
+)
+</code></pre>
+
+<p>
+  Hyperparameter tuning is an important part of maximizing the performance of a
+  neural network. Thankfully, most of that work is done for us by utilizing
+  DistilBERT. One hyperparameter we can tune, however, is the learning rate. If
+  our learning rate is too large, the model will  fail to converge. If our
+  learning rate is too slow, the model will take too long to converge or we will
+  become stuck in an undesirable local minima.  We can use the
+  <code>lr_find()</code> and <code>lr_plot()</code> methods in
+  <code>ktrain</code> to visually determine the best learning rate available:
+</p>
+<pre><code class="language-python">
+model = preprocessor.get_classifier()
+learner = ktrain.get_learner(
+    model,
+    train_data=data_train,
+    val_data=data_test,
+    batch_size=16
+)
+
+learner.lr_find(max_epochs=5)
+learner.lr_plot()
+</code></pre>
+
+<p>
+  After estimating the optimal learning rate, we can now fit DistilBERT to our
+  training data. To avoid overfitting, we utilize early stopping to revert to
+  the model with the lowest validation loss if that validation loss does not
+  increase after 2 epochs. Additionally, if our learning rate fails to improve
+  after an epoch, we reduce our maximum learning rate by a factor of 2.5 to help
+  the model finely tune:
+</p>
+<pre><code class="language-python">
+history = learner.autofit(
+    lr=1e-4,
+    epochs=10,
+    early_stopping=2,
+    reduce_on_plateau=1,
+    reduce_factor=2.5
+)
+</code></pre>
+
+<p>
+  The model stops on the 4th epoch, retrieving the best weights from the 2nd
+  epoch. There may be a number of reasons for a nueral network to converge
+  quickly. Optimizing the learning rate will help the model to reach convergence
+  faster than if it was not optimized. Thus, sacrifing 5 epochs choosing a
+  proper learning rate may have helped our model to converge only at the second
+  epoch. Reducing the learning rate after failing to improve validation loss
+  helps to ensure we fit into a local minimum. Additionally, although 200,000 is
+  a large number of samples for a binary classification problem, it is likely
+  not entirely sufficient for a multi-class text classification problem where we
+  have thousands of features and approximately a dozen classes. Utilizing proper
+  data augmentation techniques may help our model train longer and reach a lower
+  minima.
+</p>
+<div class="figure">
+  <div id="chart-dl-loss"></div>
+  <p>
+    <b>Figure 5:</b>
+    Performance of the DistilBERT model after each epoch. The model minimizes
+    the validation loss on the second epoch and begins to overfit. Training
+    halts after the 4th epoch due to a lack of improvement in the validation
+    loss.
+  </p>
+</div>
+
+<p>
+  The neural network outperforms the classical machine-learning models in nearly
+  all categories, but it still has difficultiess on some of the same categories.
+  In particular, both models struggle the most on <code>Business</code>,
+  <code>Comedy</code>, and <code>Healthy Living</code>. And both models
+  frequently misclassify <code>Healthy Living</code> text observations as
+  <code>Wellness</code>. This is likely due to the large class imbalance and
+  similarity semantic between the two. <code>Wellness</code> is the 2nd most
+  frequent category with approximately 17,000 observationss.
+  <code>Healthy Living</code>, on the other hand, has about 7,000 observations,
+  nearly 40% that of <code>Wellness</code>. Class balancing using data
+  augmentation would be one technique to mitigate this problem. We could also
+  remove observations from the <code>Wellness</code> category, but this would
+  hinder the performance of its classifications.
+</p>
+<div class="figure">
+  <div id="chart-dl-performance"></div>
+  <p>
+    <b>Figure 6:</b>
+    Confusion matrix and model evaluation metrics for the DistilBERT model. Like
+    the machine-learning models, the confusion is normalized to the ground
+    truth.
+  </p>
+</div>
+
+
+<h3 id="Model Deployment">Model Deployment</h2>
+<p>
+  <code>ktrain</code> provides some useful utilies for deploying our deep-
+  learning model into a production environment. We can do this in 3 steps:
+  <ol>
+    <li>
+      <b>Saving the model to disk</b>
+      will allow us to load it at will and in different environments without the
+      need to retrain the model.
+    </li>
+    <li>
+      <b>Loading the model into an API</b>
+      will allow us to call the model with streams of incoming data
+      observations. It also enables us to return an HTTP response, permitting
+      use over the internet.
+    </li>
+    <li>
+      <b>Containerizing the application</b>
+      using Docker or another containerization technology will allow us to
+      deploy the API as an microservice that others can integrate into their own
+      applications. Docker also allows the service to be run on its own network,
+      reducing security concerns.
+    </li>
+  </ol>
+</p>
+<p>
+  Here, we'll demonstrate parts of the first 2 steps by saving, loading, and
+  making predictions from our model. In <code>ktrain</code>, we can save our
+  model by first retrieving the predictor of our learner. The predictor and
+  preprocessor can then be saved into a given directory.
+</p>
+<pre><code class="language-python">
+predictor = ktrain.get_predictor(learner.model, preprocessor)
+predictor.save("distilbert")
+</code></pre>
+
+<p>
+  Next, we can load the preprocessor and the predictor independently. Since the
+  preprocessor is serialized, we must use <code>pickle</code> to read it:
+</p>
+<pre><code class="language-python">
+with open("distilbert/tf_model.preproc", "rb") as preproc:
+    preprocessor = pickle.load(preproc)
+    
+predictor = ktrain.load_predictor("distilbert")
+</code></pre>
+
+<p>
+  We are now ready to make predictions from the data. Suppose that we have a
+  stream of incoming text observations that we want to predict the category
+  from:
+</p>
+
+<pre><code class="language-python">
+x_stream = [
+    "It is important to always live a healthy life with exercise and a good diet!",
+    "100 Best knock-knock jokes this year! Which one is your favorite?",
+    "Trump trumps his past Trump by hiring Trump to play Trump.",
+    "Italy? Greece? Bangladesh? What countries should and shouldn't you visit?",
+    "Learn how to teach your kids to be better kids with this 1 simple trick",
+]
+</code></pre>
+
+<p>
+  If we wish to directly predict the label, we can simply use the predictor's
+  <code>predict()</code> method:
+</p>
+<pre><code class="language-python">
+y_pred = predictor.predict(x_stream)
+print(y_pred)
+
+
+# >>> ['Healthy living', 'Comedy', 'Politics', 'Travel', 'Parenting']
+</code></pre>
+
+<p>
+  Otherwise, we can print from the <code>keras</code> model to retrieve the
+  estimated category probabilities. Then, we can find the index of the
+  maximal-probability and convert it into a label:
+</p>
+<pre><code class="language-python">
+labels = predictor.get_classes()
+labels_mapper = {i: label for i, label in enumerate(labels)}
+
+x_features = preprocessor.preprocess(x_stream)
+y_pred_probabilities = predictor.model.predict(x_features)[0]
+y_pred_indices = np.argmax(y_pred_probabilities, axis=1)
+y_pred_labels = [labels_mapper[index] for index in y_pred_indices]
+
+print(y_pred_labels)
+
+
+# >>> ['Healthy living', 'Comedy', 'Politics', 'Travel', 'Parenting']
+</code></pre>
+
+
+<h2 id="Conclusion">Conclusion</h2>
+<p>
+  We explored contextual advertising by predicting the context of various news
+  article categories such as <code>Politics</code>, <code>Healthy Living</code>,
+  and <code>Comedy</code>. Using both standard machine-learning algorithms and a
+  DistilBERT deep-learning model, we determine that the DistilBERT model
+  outperforms the standard models in nearly all categories. This is likely due
+  to the inherent ability of neural networks to serve as feature extractors,
+  allowing them to perform much better in higher-dimensional spaces. Lastly, we
+  demonstrated how to deploy this model into an environemnt to be utilized for
+  text categorization.
+</p>
+<p>
+  In the future, there may be a number of ways to significantly improve the
+  performance of both the machine- and deep-learning models. One way, in 
+  particular, would be to utilize data augmentation to balance the classes and
+  to help the models generalize further. This would help them distinguish the
+  differences in highly related categories such as <code>Wellness</code> and
+  <code>Healthy Living</code>. To improve the standard machine-learning models,
+  it would likely be beneficial to integrate parts-of-speech analysis and
+  keyword analysis. Parts of speech analysis could add helpful information while
+  potentially reducing the feature space significantly by dropping uninformative
+  parts-of-speech. Keyword analysis would help us analyze and visualize the
+  unique keywords that help determine the category of any given news article.
+  Overall, while the deep-learning model outperforms that machine-learning model
+  in nearly all aspects, data augmentation and proper feature engineering may
+  diminish this difference, increase the speed of learning, making predictions,
+  and reduce overall model size and complexity.
+</p>
+
+
+<!-- 
+ALTAIR CHARTS
+-->
+<script>
+  (function(vegaEmbed) {
+    var spec = {"config": {"arc": {"fill": "#537eff"}, "area": {"fill": "#537eff"}, "circle": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "bar": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "line": {"stroke": "#537eff"}, "path": {"stroke": "#537eff"}, "point": {"stroke": "#537eff"}, "rect": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "shape": {"stroke": "#537eff"}, "symbol": {"fill": "#537eff"}, "title": {"font": "IBM Plex Mono", "color": "#FFFFFF", "fontSize": 22.5, "anchor": "start"}, "axis": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4, "gridColor": "#FFFFFF", "gridOpacity": 0.5, "domainColor": "#FFFFFF", "tickColor": "#FFFFFF"}, "header": {"labelFont": "IBM Plex Mono", "titleFont": "IBM Plex Mono", "color": "#FFFFFF", "labelColor": "#FFFFFF", "titleColor": "#FFFFFF", "labelFontSize": 18, "titleFontSize": 18}, "legend": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4}, "range": {"category": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "diverging": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "heatmap": ["#161618", "#FFFFFF"], "ramp": ["#161618", "#FFFFFF"], "ordinal": ["#161618", "#FFFFFF"]}, "background": "#161618", "type": "fit"}, "data": {"name": "data-cbbde7e5de4c3ff7610854597ea196e4"}, "mark": {"type": "circle", "opacity": 0.75}, "encoding": {"size": {"field": "Standard Deviation", "type": "quantitative"}, "tooltip": [{"field": "Category", "type": "nominal"}], "x": {"field": "Mean X", "scale": {"domain": [-0.5, 0.5]}, "title": "PC1", "type": "quantitative"}, "y": {"field": "Mean Y", "scale": {"domain": [-0.5, 0.5]}, "title": "PC2", "type": "quantitative"}}, "height": 400, "selection": {"selector001": {"type": "interval", "bind": "scales", "encodings": ["x", "y"]}}, "width": 400, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-cbbde7e5de4c3ff7610854597ea196e4": [{"Category": "Food & drink", "Mean X": 0.1192153594911082, "Mean Y": -0.10148432248472006, "Standard Deviation": 0.0520125931904605}, {"Category": "Entertainment", "Mean X": 0.11241594591302649, "Mean Y": -0.051083108244746156, "Standard Deviation": 0.09350275456771742}, {"Category": "Business", "Mean X": 0.11568585922365054, "Mean Y": -0.06551274291763817, "Standard Deviation": 0.06909193051696226}, {"Category": "Healthy living", "Mean X": 0.11352159915251238, "Mean Y": -0.07988328035387711, "Standard Deviation": 0.061756954474262174}, {"Category": "Parenting", "Mean X": 0.1380668899272267, "Mean Y": -0.10792286890674112, "Standard Deviation": 0.047720630574991756}, {"Category": "Wellness", "Mean X": 0.13125642028809734, "Mean Y": -0.09804038488165863, "Standard Deviation": 0.05069561091016639}, {"Category": "Queer voices", "Mean X": 0.12644407019160508, "Mean Y": -0.06788134624784366, "Standard Deviation": 0.07918304094200895}, {"Category": "Style & beauty", "Mean X": 0.14722236880831055, "Mean Y": -0.13462429492233086, "Standard Deviation": 0.05414402221136184}, {"Category": "Politics", "Mean X": 0.18557381701481565, "Mean Y": 0.0653503735052991, "Standard Deviation": 0.15616471009686184}, {"Category": "Comedy", "Mean X": 0.1595853629409974, "Mean Y": 0.010241553648523567, "Standard Deviation": 0.15248096291184418}, {"Category": "Travel", "Mean X": 0.12990568693830018, "Mean Y": -0.10517089955089128, "Standard Deviation": 0.05832750092386224}]}};
+    var embedOpt = {"mode": "vega-lite"};
+
+    function showError(el, error){
+        el.innerHTML = ('<div class="error" style="color:red;">'
+                        + '<p>JavaScript Error: ' + error.message + '</p>'
+                        + "<p>This usually means there's a typo in your chart specification. "
+                        + "See the javascript console for the full traceback.</p>"
+                        + '</div>');
+        throw error;
+    }
+    const el = document.getElementById('chart-svd');
+    vegaEmbed("#chart-svd", spec, embedOpt)
+      .catch(error => showError(el, error));
+  })(vegaEmbed);
+</script>
+
+
+<script>
+  (function(vegaEmbed) {
+    var spec = {"config": {"arc": {"fill": "#537eff"}, "area": {"fill": "#537eff"}, "circle": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "bar": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "line": {"stroke": "#537eff"}, "path": {"stroke": "#537eff"}, "point": {"stroke": "#537eff"}, "rect": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "shape": {"stroke": "#537eff"}, "symbol": {"fill": "#537eff"}, "title": {"font": "IBM Plex Mono", "color": "#FFFFFF", "fontSize": 22.5, "anchor": "start"}, "axis": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4, "gridColor": "#FFFFFF", "gridOpacity": 0.5, "domainColor": "#FFFFFF", "tickColor": "#FFFFFF"}, "header": {"labelFont": "IBM Plex Mono", "titleFont": "IBM Plex Mono", "color": "#FFFFFF", "labelColor": "#FFFFFF", "titleColor": "#FFFFFF", "labelFontSize": 18, "titleFontSize": 18}, "legend": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4}, "range": {"category": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "diverging": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "heatmap": ["#161618", "#FFFFFF"], "ramp": ["#161618", "#FFFFFF"], "ordinal": ["#161618", "#FFFFFF"]}, "background": "#161618", "type": "fit"}, "data": {"name": "data-58bb700763ba9252530bbfd5fc3cbd98"}, "mark": "bar", "encoding": {"color": {"field": "Keep", "sort": [true, false], "type": "nominal"}, "tooltip": [{"field": "Category", "type": "nominal"}, {"field": "Frequency", "type": "quantitative"}, {"field": "Keep", "type": "nominal"}], "x": {"field": "Frequency", "type": "quantitative"}, "y": {"field": "Category", "sort": "-x", "type": "nominal"}}, "width": 400, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-58bb700763ba9252530bbfd5fc3cbd98": [{"Category": "Politics", "Frequency": 32739, "Keep": true}, {"Category": "Wellness", "Frequency": 17827, "Keep": true}, {"Category": "Entertainment", "Frequency": 16058, "Keep": true}, {"Category": "Travel", "Frequency": 9887, "Keep": true}, {"Category": "Style & beauty", "Frequency": 9649, "Keep": true}, {"Category": "Parenting", "Frequency": 8677, "Keep": true}, {"Category": "Healthy living", "Frequency": 6694, "Keep": true}, {"Category": "Queer voices", "Frequency": 6314, "Keep": true}, {"Category": "Food & drink", "Frequency": 6226, "Keep": true}, {"Category": "Business", "Frequency": 5937, "Keep": true}, {"Category": "Comedy", "Frequency": 5175, "Keep": true}, {"Category": "Sports", "Frequency": 4884, "Keep": false}, {"Category": "Black voices", "Frequency": 4528, "Keep": false}, {"Category": "Home & living", "Frequency": 4195, "Keep": false}, {"Category": "Parents", "Frequency": 3955, "Keep": false}, {"Category": "The worldpost", "Frequency": 3664, "Keep": false}, {"Category": "Weddings", "Frequency": 3651, "Keep": false}, {"Category": "Women", "Frequency": 3490, "Keep": false}, {"Category": "Impact", "Frequency": 3459, "Keep": false}, {"Category": "Divorce", "Frequency": 3426, "Keep": false}, {"Category": "Crime", "Frequency": 3405, "Keep": false}, {"Category": "Media", "Frequency": 2815, "Keep": false}, {"Category": "Weird news", "Frequency": 2670, "Keep": false}, {"Category": "Green", "Frequency": 2622, "Keep": false}, {"Category": "Worldpost", "Frequency": 2579, "Keep": false}, {"Category": "Religion", "Frequency": 2556, "Keep": false}, {"Category": "Style", "Frequency": 2254, "Keep": false}, {"Category": "Science", "Frequency": 2178, "Keep": false}, {"Category": "World news", "Frequency": 2177, "Keep": false}, {"Category": "Taste", "Frequency": 2096, "Keep": false}, {"Category": "Tech", "Frequency": 2082, "Keep": false}, {"Category": "Money", "Frequency": 1707, "Keep": false}, {"Category": "Arts", "Frequency": 1509, "Keep": false}, {"Category": "Fifty", "Frequency": 1401, "Keep": false}, {"Category": "Good news", "Frequency": 1398, "Keep": false}, {"Category": "Arts & culture", "Frequency": 1339, "Keep": false}, {"Category": "Environment", "Frequency": 1323, "Keep": false}, {"Category": "College", "Frequency": 1144, "Keep": false}, {"Category": "Latino voices", "Frequency": 1129, "Keep": false}, {"Category": "Culture & arts", "Frequency": 1030, "Keep": false}, {"Category": "Education", "Frequency": 1004, "Keep": false}]}};
+    var embedOpt = {"mode": "vega-lite"};
+
+    function showError(el, error){
+        el.innerHTML = ('<div class="error" style="color:red;">'
+                        + '<p>JavaScript Error: ' + error.message + '</p>'
+                        + "<p>This usually means there's a typo in your chart specification. "
+                        + "See the javascript console for the full traceback.</p>"
+                        + '</div>');
+        throw error;
+    }
+    const el = document.getElementById('chart-category-counts');
+    vegaEmbed("#chart-category-counts", spec, embedOpt)
+      .catch(error => showError(el, error));
+  })(vegaEmbed);
+</script>
+
+
+<script>
+  (function(vegaEmbed) {
+    var spec = {"config": {"arc": {"fill": "#537eff"}, "area": {"fill": "#537eff"}, "circle": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "bar": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "line": {"stroke": "#537eff"}, "path": {"stroke": "#537eff"}, "point": {"stroke": "#537eff"}, "rect": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "shape": {"stroke": "#537eff"}, "symbol": {"fill": "#537eff"}, "title": {"font": "IBM Plex Mono", "color": "#FFFFFF", "fontSize": 16, "anchor": "middle"}, "axis": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4, "gridColor": "#FFFFFF", "gridOpacity": 0.5, "domainColor": "#FFFFFF", "tickColor": "#FFFFFF"}, "header": {"labelFont": "IBM Plex Mono", "titleFont": "IBM Plex Mono", "color": "#FFFFFF", "labelColor": "#FFFFFF", "titleColor": "#FFFFFF", "labelFontSize": 18, "titleFontSize": 18}, "legend": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4}, "range": {"category": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "diverging": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "heatmap": ["#161618", "#FFFFFF"], "ramp": ["#161618", "#FFFFFF"], "ordinal": ["#161618", "#FFFFFF"]}, "background": "#161618", "type": "fit"}, "vconcat": [{"hconcat": [{"data": {"name": "data-4f4adf612f7d2c3f677367a8c751e16b"}, "mark": "rect", "encoding": {"color": {"field": "value", "scale": {"domain": [0, 1]}, "title": ["Relative", "Frequency"], "type": "quantitative"}, "tooltip": [{"field": "Ground Truth", "type": "nominal"}, {"field": "key", "title": "Predicted", "type": "nominal"}, {"field": "value", "title": "Relative Frequency", "type": "quantitative"}], "x": {"field": "Ground Truth", "type": "nominal"}, "y": {"field": "key", "title": "Predicted", "type": "nominal"}}, "height": 300, "title": "Decision Tree", "transform": [{"fold": ["Entertainment", "Queer voices", "Politics", "Comedy", "Food & drink", "Parenting", "Healthy living", "Business", "Wellness", "Style & beauty", "Travel"]}], "width": 300}, {"data": {"name": "data-06d08893a4987124019f030ac0baf794"}, "mark": "rect", "encoding": {"color": {"field": "value", "scale": {"domain": [0, 1]}, "title": ["Relative", "Frequency"], "type": "quantitative"}, "tooltip": [{"field": "Ground Truth", "type": "nominal"}, {"field": "key", "title": "Predicted", "type": "nominal"}, {"field": "value", "title": "Relative Frequency", "type": "quantitative"}], "x": {"field": "Ground Truth", "type": "nominal"}, "y": {"field": "key", "title": "Predicted", "type": "nominal"}}, "height": 300, "title": "Random Forest", "transform": [{"fold": ["Entertainment", "Queer voices", "Politics", "Comedy", "Food & drink", "Parenting", "Healthy living", "Business", "Wellness", "Style & beauty", "Travel"]}], "width": 300}]}, {"data": {"name": "data-35426d9a89b88975d5a97ecd6be66a9d"}, "mark": "rect", "encoding": {"color": {"field": "value", "scale": {"domain": [0, 1]}, "title": ["Relative", "Frequency"], "type": "quantitative"}, "tooltip": [{"field": "Ground Truth", "type": "nominal"}, {"field": "key", "title": "Predicted", "type": "nominal"}, {"field": "value", "title": "Relative Frequency", "type": "quantitative"}], "x": {"field": "Ground Truth", "type": "nominal"}, "y": {"field": "key", "title": "Predicted", "type": "nominal"}}, "height": 300, "title": "Logistic Regression", "transform": [{"fold": ["Entertainment", "Queer voices", "Politics", "Comedy", "Food & drink", "Parenting", "Healthy living", "Business", "Wellness", "Style & beauty", "Travel"]}], "width": 300}], "center": true, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-4f4adf612f7d2c3f677367a8c751e16b": [{"Entertainment": 0.49230769230769234, "Queer voices": 0.040615384615384616, "Politics": 0.15323076923076923, "Comedy": 0.02707692307692308, "Food & drink": 0.03753846153846154, "Parenting": 0.038153846153846156, "Healthy living": 0.036923076923076927, "Business": 0.028307692307692308, "Wellness": 0.0756923076923077, "Style & beauty": 0.028923076923076923, "Travel": 0.04123076923076923, "Ground Truth": "Entertainment"}, {"Entertainment": 0.19165378670788252, "Queer voices": 0.30602782071097373, "Politics": 0.1777434312210201, "Comedy": 0.02009273570324575, "Food & drink": 0.02627511591962906, "Parenting": 0.04945904173106646, "Healthy living": 0.02472952086553323, "Business": 0.030911901081916538, "Wellness": 0.09119010819165378, "Style & beauty": 0.03554868624420402, "Travel": 0.04636785162287481, "Ground Truth": "Queer voices"}, {"Entertainment": 0.11229277447607132, "Queer voices": 0.02158273381294964, "Politics": 0.668439161714107, "Comedy": 0.032843290584923364, "Food & drink": 0.008445417578980294, "Parenting": 0.01689083515796059, "Healthy living": 0.02158273381294964, "Business": 0.03440725680325305, "Wellness": 0.05223647169221145, "Style & beauty": 0.008445417578980294, "Travel": 0.02283390678761339, "Ground Truth": "Politics"}, {"Entertainment": 0.29423076923076924, "Queer voices": 0.03653846153846154, "Politics": 0.2519230769230769, "Comedy": 0.13653846153846153, "Food & drink": 0.021153846153846155, "Parenting": 0.032692307692307694, "Healthy living": 0.03076923076923077, "Business": 0.032692307692307694, "Wellness": 0.06153846153846154, "Style & beauty": 0.05, "Travel": 0.051923076923076926, "Ground Truth": "Comedy"}, {"Entertainment": 0.16638655462184873, "Queer voices": 0.015126050420168067, "Politics": 0.06218487394957983, "Comedy": 0.02857142857142857, "Food & drink": 0.35294117647058826, "Parenting": 0.02857142857142857, "Healthy living": 0.05378151260504202, "Business": 0.03529411764705882, "Wellness": 0.11764705882352941, "Style & beauty": 0.0453781512605042, "Travel": 0.09411764705882353, "Ground Truth": "Food & drink"}, {"Entertainment": 0.10466439135381114, "Queer voices": 0.02957906712172924, "Politics": 0.07394766780432309, "Comedy": 0.017064846416382253, "Food & drink": 0.02844141069397042, "Parenting": 0.46871444823663255, "Healthy living": 0.04323094425483504, "Business": 0.015927189988623434, "Wellness": 0.13083048919226395, "Style & beauty": 0.038680318543799774, "Travel": 0.048919226393629126, "Ground Truth": "Parenting"}, {"Entertainment": 0.2002820874471086, "Queer voices": 0.028208744710860368, "Politics": 0.1156558533145275, "Comedy": 0.023977433004231313, "Food & drink": 0.0380818053596615, "Parenting": 0.0535966149506347, "Healthy living": 0.14104372355430184, "Business": 0.03526093088857546, "Wellness": 0.2933709449929478, "Style & beauty": 0.031029619181946404, "Travel": 0.039492242595204514, "Ground Truth": "Healthy living"}, {"Entertainment": 0.18104906937394247, "Queer voices": 0.028764805414551606, "Politics": 0.21489001692047377, "Comedy": 0.02030456852791878, "Food & drink": 0.03722504230118443, "Parenting": 0.023688663282571912, "Healthy living": 0.03722504230118443, "Business": 0.1996615905245347, "Wellness": 0.1455160744500846, "Style & beauty": 0.021996615905245348, "Travel": 0.08967851099830795, "Ground Truth": "Business"}, {"Entertainment": 0.08877434135166094, "Queer voices": 0.018327605956471937, "Politics": 0.09163802978235967, "Comedy": 0.017754868270332187, "Food & drink": 0.04066437571592211, "Parenting": 0.05956471935853379, "Healthy living": 0.10652920962199312, "Business": 0.04639175257731959, "Wellness": 0.45017182130584193, "Style & beauty": 0.025200458190148912, "Travel": 0.054982817869415807, "Ground Truth": "Wellness"}, {"Entertainment": 0.087890625, "Queer voices": 0.013671875, "Politics": 0.0595703125, "Comedy": 0.0185546875, "Food & drink": 0.0390625, "Parenting": 0.033203125, "Healthy living": 0.0205078125, "Business": 0.017578125, "Wellness": 0.0703125, "Style & beauty": 0.5634765625, "Travel": 0.076171875, "Ground Truth": "Style & beauty"}, {"Entertainment": 0.12271805273833672, "Queer voices": 0.02231237322515213, "Politics": 0.0973630831643002, "Comedy": 0.02636916835699797, "Food & drink": 0.056795131845841784, "Parenting": 0.03955375253549696, "Healthy living": 0.030425963488843813, "Business": 0.03955375253549696, "Wellness": 0.10851926977687627, "Style & beauty": 0.0821501014198783, "Travel": 0.3742393509127789, "Ground Truth": "Travel"}], "data-06d08893a4987124019f030ac0baf794": [{"Entertainment": 0.5593846153846154, "Queer voices": 0.014153846153846154, "Politics": 0.18584615384615386, "Comedy": 0.009230769230769232, "Food & drink": 0.022153846153846152, "Parenting": 0.04, "Healthy living": 0.015384615384615385, "Business": 0.012923076923076923, "Wellness": 0.088, "Style & beauty": 0.023384615384615386, "Travel": 0.029538461538461538, "Ground Truth": "Entertainment"}, {"Entertainment": 0.18701700154559506, "Queer voices": 0.32457496136012365, "Politics": 0.19165378670788252, "Comedy": 0.0030911901081916537, "Food & drink": 0.010819165378670788, "Parenting": 0.05564142194744977, "Healthy living": 0.015455950540958269, "Business": 0.017001545595054096, "Wellness": 0.13601236476043277, "Style & beauty": 0.02009273570324575, "Travel": 0.03863987635239567, "Ground Truth": "Queer voices"}, {"Entertainment": 0.08852048795746012, "Queer voices": 0.007507037847982484, "Politics": 0.7782295902408508, "Comedy": 0.008758210822646231, "Food & drink": 0.003440725680325305, "Parenting": 0.01376290272130122, "Healthy living": 0.0059430716296528, "Business": 0.014388489208633094, "Wellness": 0.05661557710353456, "Style & beauty": 0.005630278385986863, "Travel": 0.017203628401626526, "Ground Truth": "Politics"}, {"Entertainment": 0.3211538461538462, "Queer voices": 0.0057692307692307696, "Politics": 0.325, "Comedy": 0.09807692307692308, "Food & drink": 0.011538461538461539, "Parenting": 0.03653846153846154, "Healthy living": 0.011538461538461539, "Business": 0.007692307692307693, "Wellness": 0.1, "Style & beauty": 0.04038461538461539, "Travel": 0.04230769230769231, "Ground Truth": "Comedy"}, {"Entertainment": 0.14453781512605043, "Queer voices": 0.0033613445378151263, "Politics": 0.07394957983193277, "Comedy": 0.015126050420168067, "Food & drink": 0.3915966386554622, "Parenting": 0.018487394957983194, "Healthy living": 0.020168067226890758, "Business": 0.013445378151260505, "Wellness": 0.17647058823529413, "Style & beauty": 0.05042016806722689, "Travel": 0.09243697478991597, "Ground Truth": "Food & drink"}, {"Entertainment": 0.07281001137656427, "Queer voices": 0.006825938566552901, "Politics": 0.04664391353811149, "Comedy": 0.007963594994311717, "Food & drink": 0.006825938566552901, "Parenting": 0.664391353811149, "Healthy living": 0.004550625711035267, "Business": 0.004550625711035267, "Wellness": 0.14448236632536973, "Style & beauty": 0.013651877133105802, "Travel": 0.027303754266211604, "Ground Truth": "Parenting"}, {"Entertainment": 0.18758815232722145, "Queer voices": 0.005641748942172073, "Politics": 0.12693935119887165, "Comedy": 0.015514809590973202, "Food & drink": 0.02538787023977433, "Parenting": 0.05077574047954866, "Healthy living": 0.06488011283497884, "Business": 0.01692524682651622, "Wellness": 0.4682651622002821, "Style & beauty": 0.01692524682651622, "Travel": 0.021156558533145273, "Ground Truth": "Healthy living"}, {"Entertainment": 0.17428087986463622, "Queer voices": 0.01353637901861252, "Politics": 0.26903553299492383, "Comedy": 0.00676818950930626, "Food & drink": 0.018612521150592216, "Parenting": 0.011844331641285956, "Healthy living": 0.018612521150592216, "Business": 0.1996615905245347, "Wellness": 0.19796954314720813, "Style & beauty": 0.01692047377326565, "Travel": 0.0727580372250423, "Ground Truth": "Business"}, {"Entertainment": 0.08075601374570447, "Queer voices": 0.003436426116838488, "Politics": 0.08648339060710195, "Comedy": 0.0057273768613974796, "Food & drink": 0.0286368843069874, "Parenting": 0.054982817869415807, "Healthy living": 0.029782359679266894, "Business": 0.01718213058419244, "Wellness": 0.6449026345933563, "Style & beauty": 0.016036655211912942, "Travel": 0.032073310423825885, "Ground Truth": "Wellness"}, {"Entertainment": 0.0810546875, "Queer voices": 0.00390625, "Politics": 0.056640625, "Comedy": 0.0078125, "Food & drink": 0.0107421875, "Parenting": 0.02734375, "Healthy living": 0.0068359375, "Business": 0.0087890625, "Wellness": 0.09375, "Style & beauty": 0.646484375, "Travel": 0.056640625, "Ground Truth": "Style & beauty"}, {"Entertainment": 0.13995943204868155, "Queer voices": 0.005070993914807302, "Politics": 0.09939148073022312, "Comedy": 0.012170385395537525, "Food & drink": 0.032454361054766734, "Parenting": 0.032454361054766734, "Healthy living": 0.015212981744421906, "Business": 0.02434077079107505, "Wellness": 0.16024340770791076, "Style & beauty": 0.07606490872210954, "Travel": 0.4026369168356998, "Ground Truth": "Travel"}], "data-35426d9a89b88975d5a97ecd6be66a9d": [{"Entertainment": 0.5846153846153846, "Queer voices": 0.008, "Politics": 0.176, "Comedy": 0.012307692307692308, "Food & drink": 0.017846153846153845, "Parenting": 0.04246153846153846, "Healthy living": 0.0036923076923076922, "Business": 0.005538461538461538, "Wellness": 0.08307692307692308, "Style & beauty": 0.028307692307692308, "Travel": 0.038153846153846156, "Ground Truth": "Entertainment"}, {"Entertainment": 0.19629057187017002, "Queer voices": 0.30602782071097373, "Politics": 0.2117465224111283, "Comedy": 0.0030911901081916537, "Food & drink": 0.00463678516228748, "Parenting": 0.05564142194744977, "Healthy living": 0.0015455950540958269, "Business": 0.010819165378670788, "Wellness": 0.160741885625966, "Style & beauty": 0.02009273570324575, "Travel": 0.02936630602782071, "Ground Truth": "Queer voices"}, {"Entertainment": 0.0925868001251173, "Queer voices": 0.0059430716296528, "Politics": 0.7994995308101345, "Comedy": 0.0046918986549890525, "Food & drink": 0.003440725680325305, "Parenting": 0.009383797309978105, "Healthy living": 0.0012511729746637473, "Business": 0.009383797309978105, "Wellness": 0.05129809196121364, "Style & beauty": 0.0028151391929934315, "Travel": 0.01970597435095402, "Ground Truth": "Politics"}, {"Entertainment": 0.34423076923076923, "Queer voices": 0.009615384615384616, "Politics": 0.3269230769230769, "Comedy": 0.05576923076923077, "Food & drink": 0.011538461538461539, "Parenting": 0.03653846153846154, "Healthy living": 0.0019230769230769232, "Business": 0.007692307692307693, "Wellness": 0.11538461538461539, "Style & beauty": 0.04038461538461539, "Travel": 0.05, "Ground Truth": "Comedy"}, {"Entertainment": 0.13109243697478992, "Queer voices": 0.0016806722689075631, "Politics": 0.08403361344537816, "Comedy": 0.008403361344537815, "Food & drink": 0.4151260504201681, "Parenting": 0.02857142857142857, "Healthy living": 0.010084033613445379, "Business": 0.005042016806722689, "Wellness": 0.16806722689075632, "Style & beauty": 0.047058823529411764, "Travel": 0.10084033613445378, "Ground Truth": "Food & drink"}, {"Entertainment": 0.0875995449374289, "Queer voices": 0.004550625711035267, "Politics": 0.053469852104664393, "Comedy": 0.0034129692832764505, "Food & drink": 0.007963594994311717, "Parenting": 0.6370875995449374, "Healthy living": 0.0034129692832764505, "Business": 0.0, "Wellness": 0.1547212741751991, "Style & beauty": 0.01478953356086462, "Travel": 0.03299203640500569, "Ground Truth": "Parenting"}, {"Entertainment": 0.18194640338504936, "Queer voices": 0.0028208744710860366, "Politics": 0.12129760225669958, "Comedy": 0.005641748942172073, "Food & drink": 0.04090267983074753, "Parenting": 0.04372355430183357, "Healthy living": 0.018335684062059238, "Business": 0.00846262341325811, "Wellness": 0.53737658674189, "Style & beauty": 0.009873060648801129, "Travel": 0.029619181946403384, "Ground Truth": "Healthy living"}, {"Entertainment": 0.1844331641285956, "Queer voices": 0.00338409475465313, "Politics": 0.29780033840947545, "Comedy": 0.001692047377326565, "Food & drink": 0.015228426395939087, "Parenting": 0.011844331641285956, "Healthy living": 0.00676818950930626, "Business": 0.19120135363790186, "Wellness": 0.2098138747884941, "Style & beauty": 0.018612521150592216, "Travel": 0.05922165820642978, "Ground Truth": "Business"}, {"Entertainment": 0.06930126002290951, "Queer voices": 0.0057273768613974796, "Politics": 0.09049255441008018, "Comedy": 0.002290950744558992, "Food & drink": 0.02577319587628866, "Parenting": 0.048109965635738834, "Healthy living": 0.004009163802978236, "Business": 0.012600229095074456, "Wellness": 0.6884306987399771, "Style & beauty": 0.014891179839633447, "Travel": 0.03837342497136312, "Ground Truth": "Wellness"}, {"Entertainment": 0.0859375, "Queer voices": 0.0029296875, "Politics": 0.0537109375, "Comedy": 0.009765625, "Food & drink": 0.0146484375, "Parenting": 0.0224609375, "Healthy living": 0.001953125, "Business": 0.0107421875, "Wellness": 0.1015625, "Style & beauty": 0.6474609375, "Travel": 0.048828125, "Ground Truth": "Style & beauty"}, {"Entertainment": 0.13387423935091278, "Queer voices": 0.002028397565922921, "Politics": 0.0922920892494929, "Comedy": 0.0030425963488843813, "Food & drink": 0.029411764705882353, "Parenting": 0.03144016227180527, "Healthy living": 0.004056795131845842, "Business": 0.013184584178498986, "Wellness": 0.15415821501014199, "Style & beauty": 0.07707910750507099, "Travel": 0.4594320486815416, "Ground Truth": "Travel"}]}};
+    var embedOpt = {"mode": "vega-lite"};
+
+    function showError(el, error){
+        el.innerHTML = ('<div class="error" style="color:red;">'
+                        + '<p>JavaScript Error: ' + error.message + '</p>'
+                        + "<p>This usually means there's a typo in your chart specification. "
+                        + "See the javascript console for the full traceback.</p>"
+                        + '</div>');
+        throw error;
+    }
+    const el = document.getElementById('chart-ml-cmatrix');
+    vegaEmbed("#chart-ml-cmatrix", spec, embedOpt)
+      .catch(error => showError(el, error));
+  })(vegaEmbed);
+
+</script>
+
+
+<script>
+  (function(vegaEmbed) {
+    var spec = {"config": {"arc": {"fill": "#537eff"}, "area": {"fill": "#537eff"}, "circle": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "bar": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "line": {"stroke": "#537eff"}, "path": {"stroke": "#537eff"}, "point": {"stroke": "#537eff"}, "rect": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "shape": {"stroke": "#537eff"}, "symbol": {"fill": "#537eff"}, "title": {"font": "IBM Plex Mono", "color": "#FFFFFF", "fontSize": 22.5, "anchor": "start"}, "axis": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4, "gridColor": "#FFFFFF", "gridOpacity": 0.5, "domainColor": "#FFFFFF", "tickColor": "#FFFFFF"}, "header": {"labelFont": "IBM Plex Mono", "titleFont": "IBM Plex Mono", "color": "#FFFFFF", "labelColor": "#FFFFFF", "titleColor": "#FFFFFF", "labelFontSize": 18, "titleFontSize": 18}, "legend": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4}, "range": {"category": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "diverging": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "heatmap": ["#161618", "#FFFFFF"], "ramp": ["#161618", "#FFFFFF"], "ordinal": ["#161618", "#FFFFFF"]}, "background": "#161618", "type": "fit"}, "data": {"name": "data-916b8322f2a04cf4e54eceb1a4a50880"}, "mark": "rect", "encoding": {"color": {"field": "value", "scale": {"domain": [0, 1]}, "title": "Score", "type": "quantitative"}, "column": {"field": "Model", "header": {"labelFontSize": 12}, "spacing": 20, "type": "nominal"}, "tooltip": [{"field": "Model", "title": "Model", "type": "nominal"}, {"field": "index", "title": "Metric", "type": "nominal"}, {"field": "value", "title": "Score", "type": "quantitative"}], "x": {"field": "index", "title": "", "type": "nominal"}, "y": {"field": "variable", "title": "Category", "type": "nominal"}}, "height": 400, "width": 133.33333333333334, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-916b8322f2a04cf4e54eceb1a4a50880": [{"index": "Precision", "variable": "Entertainment", "value": 0.3568242640499554, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Entertainment", "value": 0.49230769230769234, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Entertainment", "value": 0.41375743470390486, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Queer voices", "value": 0.4024390243902439, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Queer voices", "value": 0.30602782071097373, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Queer voices", "value": 0.3476733977172959, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Politics", "value": 0.655521472392638, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Politics", "value": 0.668439161714107, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Politics", "value": 0.6619172990552888, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Comedy", "value": 0.1918918918918919, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Comedy", "value": 0.13653846153846153, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Comedy", "value": 0.15955056179775282, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Food & drink", "value": 0.37037037037037035, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Food & drink", "value": 0.35294117647058826, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Food & drink", "value": 0.3614457831325302, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Parenting", "value": 0.5006075334143378, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Parenting", "value": 0.46871444823663255, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Parenting", "value": 0.48413631022326675, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Healthy living", "value": 0.1694915254237288, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Healthy living", "value": 0.14104372355430184, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Healthy living", "value": 0.15396458814472672, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Business", "value": 0.2318271119842829, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Business", "value": 0.1996615905245347, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Business", "value": 0.21454545454545457, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Wellness", "value": 0.43068493150684933, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Wellness", "value": 0.45017182130584193, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Wellness", "value": 0.4402128255390647, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Style & beauty", "value": 0.6264929424538545, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Style & beauty", "value": 0.5634765625, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Style & beauty", "value": 0.5933161953727507, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Travel", "value": 0.40108695652173915, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Travel", "value": 0.3742393509127789, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Travel", "value": 0.38719832109129065, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Macro avg", "value": 0.39429436585453564, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Macro avg", "value": 0.3775965281614466, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Macro avg", "value": 0.38342892466575695, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Weighted avg", "value": 0.4586838819752826, "Model": "Decision Tree"}, {"index": "Recall", "variable": "Weighted avg", "value": 0.46153846153846156, "Model": "Decision Tree"}, {"index": "F1-score", "variable": "Weighted avg", "value": 0.45777894825956733, "Model": "Decision Tree"}, {"index": "Precision", "variable": "Entertainment", "value": 0.40798922800718135, "Model": "Random Forest"}, {"index": "Recall", "variable": "Entertainment", "value": 0.5593846153846154, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Entertainment", "value": 0.47184012457825075, "Model": "Random Forest"}, {"index": "Precision", "variable": "Queer voices", "value": 0.711864406779661, "Model": "Random Forest"}, {"index": "Recall", "variable": "Queer voices", "value": 0.32457496136012365, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Queer voices", "value": 0.44585987261146504, "Model": "Random Forest"}, {"index": "Precision", "variable": "Politics", "value": 0.6680988184747583, "Model": "Random Forest"}, {"index": "Recall", "variable": "Politics", "value": 0.7782295902408508, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Politics", "value": 0.7189712469296344, "Model": "Random Forest"}, {"index": "Precision", "variable": "Comedy", "value": 0.3248407643312102, "Model": "Random Forest"}, {"index": "Recall", "variable": "Comedy", "value": 0.09807692307692308, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Comedy", "value": 0.15066469719350076, "Model": "Random Forest"}, {"index": "Precision", "variable": "Food & drink", "value": 0.5534441805225653, "Model": "Random Forest"}, {"index": "Recall", "variable": "Food & drink", "value": 0.3915966386554622, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Food & drink", "value": 0.45866141732283455, "Model": "Random Forest"}, {"index": "Precision", "variable": "Parenting", "value": 0.6096033402922756, "Model": "Random Forest"}, {"index": "Recall", "variable": "Parenting", "value": 0.664391353811149, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Parenting", "value": 0.6358192705498095, "Model": "Random Forest"}, {"index": "Precision", "variable": "Healthy living", "value": 0.2222222222222222, "Model": "Random Forest"}, {"index": "Recall", "variable": "Healthy living", "value": 0.06488011283497884, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Healthy living", "value": 0.10043668122270741, "Model": "Random Forest"}, {"index": "Precision", "variable": "Business", "value": 0.41114982578397213, "Model": "Random Forest"}, {"index": "Recall", "variable": "Business", "value": 0.1996615905245347, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Business", "value": 0.2687927107061504, "Model": "Random Forest"}, {"index": "Precision", "variable": "Wellness", "value": 0.44594059405940595, "Model": "Random Forest"}, {"index": "Recall", "variable": "Wellness", "value": 0.6449026345933563, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Wellness", "value": 0.5272769843128073, "Model": "Random Forest"}, {"index": "Precision", "variable": "Style & beauty", "value": 0.720348204570185, "Model": "Random Forest"}, {"index": "Recall", "variable": "Style & beauty", "value": 0.646484375, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Style & beauty", "value": 0.6814204837879568, "Model": "Random Forest"}, {"index": "Precision", "variable": "Travel", "value": 0.4974937343358396, "Model": "Random Forest"}, {"index": "Recall", "variable": "Travel", "value": 0.4026369168356998, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Travel", "value": 0.44506726457399104, "Model": "Random Forest"}, {"index": "Precision", "variable": "Macro avg", "value": 0.5066359381253889, "Model": "Random Forest"}, {"index": "Recall", "variable": "Macro avg", "value": 0.4340745193016085, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Macro avg", "value": 0.4458918867081007, "Model": "Random Forest"}, {"index": "Precision", "variable": "Weighted avg", "value": 0.5352545150330371, "Model": "Random Forest"}, {"index": "Recall", "variable": "Weighted avg", "value": 0.5450914609793115, "Model": "Random Forest"}, {"index": "F1-score", "variable": "Weighted avg", "value": 0.523300547408541, "Model": "Random Forest"}, {"index": "Precision", "variable": "Entertainment", "value": 0.41557305336832895, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Entertainment", "value": 0.5846153846153846, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Entertainment", "value": 0.48580925594477115, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Queer voices", "value": 0.7644787644787645, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Queer voices", "value": 0.30602782071097373, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Queer voices", "value": 0.43708609271523186, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Politics", "value": 0.670514165792235, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Politics", "value": 0.7994995308101345, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Politics", "value": 0.7293479811670709, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Comedy", "value": 0.3020833333333333, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Comedy", "value": 0.05576923076923077, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Comedy", "value": 0.09415584415584415, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Food & drink", "value": 0.5744186046511628, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Food & drink", "value": 0.4151260504201681, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Food & drink", "value": 0.4819512195121951, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Parenting", "value": 0.61742006615215, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Parenting", "value": 0.6370875995449374, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Parenting", "value": 0.6270996640537514, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Healthy living", "value": 0.2549019607843137, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Healthy living", "value": 0.018335684062059238, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Healthy living", "value": 0.034210526315789476, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Business", "value": 0.518348623853211, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Business", "value": 0.19120135363790186, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Business", "value": 0.27935723114956734, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Wellness", "value": 0.45154019534184825, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Wellness", "value": 0.6884306987399771, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Wellness", "value": 0.5453720508166968, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Style & beauty", "value": 0.7261774370208105, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Style & beauty", "value": 0.6474609375, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Style & beauty", "value": 0.6845637583892618, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Travel", "value": 0.511864406779661, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Travel", "value": 0.4594320486815416, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Travel", "value": 0.48423303046499194, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Macro avg", "value": 0.5279382374141653, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Macro avg", "value": 0.4366351217720281, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Macro avg", "value": 0.44392605951683384, "Model": "Logistic Regression"}, {"index": "Precision", "variable": "Weighted avg", "value": 0.549476404679434, "Model": "Logistic Regression"}, {"index": "Recall", "variable": "Weighted avg", "value": 0.5578720345075485, "Model": "Logistic Regression"}, {"index": "F1-score", "variable": "Weighted avg", "value": 0.5280713237546532, "Model": "Logistic Regression"}]}};
+    var embedOpt = {"mode": "vega-lite"};
+
+    function showError(el, error){
+        el.innerHTML = ('<div class="error" style="color:red;">'
+                        + '<p>JavaScript Error: ' + error.message + '</p>'
+                        + "<p>This usually means there's a typo in your chart specification. "
+                        + "See the javascript console for the full traceback.</p>"
+                        + '</div>');
+        throw error;
+    }
+    const el = document.getElementById('chart-ml-creport');
+    vegaEmbed("#chart-ml-creport", spec, embedOpt)
+      .catch(error => showError(el, error));
+  })(vegaEmbed);
+</script>
+
+
+<script>
+  (function(vegaEmbed) {
+    var spec = {"config": {"arc": {"fill": "#537eff"}, "area": {"fill": "#537eff"}, "circle": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "bar": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "line": {"stroke": "#537eff"}, "path": {"stroke": "#537eff"}, "point": {"stroke": "#537eff"}, "rect": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "shape": {"stroke": "#537eff"}, "symbol": {"fill": "#537eff"}, "title": {"font": "IBM Plex Mono", "color": "#FFFFFF", "fontSize": 22.5, "anchor": "start"}, "axis": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4, "gridColor": "#FFFFFF", "gridOpacity": 0.5, "domainColor": "#FFFFFF", "tickColor": "#FFFFFF"}, "header": {"labelFont": "IBM Plex Mono", "titleFont": "IBM Plex Mono", "color": "#FFFFFF", "labelColor": "#FFFFFF", "titleColor": "#FFFFFF", "labelFontSize": 18, "titleFontSize": 18}, "legend": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4}, "range": {"category": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "diverging": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "heatmap": ["#141416", "#FFFFFF"], "ramp": ["#141416", "#FFFFFF"], "ordinal": ["#141416", "#FFFFFF"]}, "background": "#141416", "type": "fit", "axisX": {"grid": false}}, "data": {"name": "data-16b8fa78dcaf76ed22a28df4c5340734"}, "mark": {"type": "line", "point": {"filled": false, "fill": "#141416", "size": 40}}, "encoding": {"color": {"field": "variable", "title": "Metric", "type": "nominal"}, "tooltip": [{"field": "variable", "title": "Metric", "type": "nominal"}, {"field": "value", "title": "Score", "type": "quantitative"}], "x": {"axis": {"values": [1, 2, 3, 4, 5, 6, 7, 8]}, "field": "Epoch", "type": "quantitative"}, "y": {"field": "value", "title": "Score", "type": "quantitative"}}, "height": 200, "width": 350, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-16b8fa78dcaf76ed22a28df4c5340734": [{"Epoch": 1, "variable": "Loss", "value": 0.6441438794136047}, {"Epoch": 2, "variable": "Loss", "value": 0.41011977195739746}, {"Epoch": 3, "variable": "Loss", "value": 0.3069400489330292}, {"Epoch": 4, "variable": "Loss", "value": 0.17420679330825806}, {"Epoch": 1, "variable": "Validation Loss", "value": 0.45775920152664185}, {"Epoch": 2, "variable": "Validation Loss", "value": 0.45513689517974854}, {"Epoch": 3, "variable": "Validation Loss", "value": 0.4831334352493286}, {"Epoch": 4, "variable": "Validation Loss", "value": 0.5553711652755737}]}};
+    var embedOpt = {"mode": "vega-lite"};
+
+    function showError(el, error){
+        el.innerHTML = ('<div class="error" style="color:red;">'
+                        + '<p>JavaScript Error: ' + error.message + '</p>'
+                        + "<p>This usually means there's a typo in your chart specification. "
+                        + "See the javascript console for the full traceback.</p>"
+                        + '</div>');
+        throw error;
+    }
+    const el = document.getElementById('chart-dl-loss');
+    vegaEmbed("#chart-dl-loss", spec, embedOpt)
+      .catch(error => showError(el, error));
+  })(vegaEmbed);
+</script>
+
+
+<script>
+  (function(vegaEmbed) {
+    var spec = {"config": {"arc": {"fill": "#537eff"}, "area": {"fill": "#537eff"}, "circle": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "bar": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "line": {"stroke": "#537eff"}, "path": {"stroke": "#537eff"}, "point": {"stroke": "#537eff"}, "rect": {"fill": "#537eff", "stroke": "#FFFFFF", "strokeWidth": 0.5}, "shape": {"stroke": "#537eff"}, "symbol": {"fill": "#537eff"}, "title": {"font": "IBM Plex Mono", "color": "#FFFFFF", "fontSize": 16, "anchor": "middle"}, "axis": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4, "gridColor": "#FFFFFF", "gridOpacity": 0.5, "domainColor": "#FFFFFF", "tickColor": "#FFFFFF"}, "header": {"labelFont": "IBM Plex Mono", "titleFont": "IBM Plex Mono", "color": "#FFFFFF", "labelColor": "#FFFFFF", "titleColor": "#FFFFFF", "labelFontSize": 18, "titleFontSize": 18}, "legend": {"titleFont": "IBM Plex Mono", "titleColor": "#FFFFFF", "titleFontSize": 14.4, "labelFont": "IBM Plex Mono", "labelColor": "#FFFFFF", "labelFontSize": 14.4}, "range": {"category": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "diverging": ["#537eff", "#00cb85", "#eeeeee", "#00e3ff", "#e935a1", "#e1562c", "#efe645"], "heatmap": ["#141416", "#FFFFFF"], "ramp": ["#141416", "#FFFFFF"], "ordinal": ["#141416", "#FFFFFF"]}, "background": "#141416", "type": "fit"}, "hconcat": [{"data": {"name": "data-8f2f06ddcfdad6767cf1fa899ca954c3"}, "mark": "rect", "encoding": {"color": {"field": "value", "scale": {"domain": [0, 1]}, "title": ["Relative", "Frequency"], "type": "quantitative"}, "tooltip": [{"field": "Ground Truth", "type": "nominal"}, {"field": "key", "title": "Predicted", "type": "nominal"}, {"field": "value", "title": "Relative Frequency", "type": "quantitative"}], "x": {"field": "Ground Truth", "type": "nominal"}, "y": {"field": "key", "title": "Predicted", "type": "nominal"}}, "height": 300, "title": "DistilBERT", "transform": [{"fold": ["Healthy living", "Parenting", "Entertainment", "Food & drink", "Style & beauty", "Wellness", "Comedy", "Politics", "Queer voices", "Travel", "Business"]}], "width": 300}, {"data": {"name": "data-de4d4a4bd87f413e7b5f21aaa318cbf3"}, "mark": "rect", "encoding": {"color": {"field": "value", "scale": {"domain": [0, 1]}, "title": "Score", "type": "quantitative"}, "column": {"field": "Model", "header": {"labelFontSize": 12}, "spacing": 20, "type": "nominal"}, "tooltip": [{"field": "Model", "title": "Model", "type": "nominal"}, {"field": "index", "title": "Metric", "type": "nominal"}, {"field": "value", "title": "Score", "type": "quantitative"}], "x": {"field": "index", "title": "", "type": "nominal"}, "y": {"field": "variable", "title": "Category", "type": "nominal"}}, "height": 400, "width": 100.0}], "resolve": {"scale": {"color": "independent"}}, "$schema": "https://vega.github.io/schema/vega-lite/v4.17.0.json", "datasets": {"data-8f2f06ddcfdad6767cf1fa899ca954c3": [{"Healthy living": 0.5273775216138329, "Parenting": 0.02881844380403458, "Entertainment": 0.018731988472622477, "Food & drink": 0.007204610951008645, "Style & beauty": 0.0, "Wellness": 0.3025936599423631, "Comedy": 0.010086455331412104, "Politics": 0.05763688760806916, "Queer voices": 0.007204610951008645, "Travel": 0.01440922190201729, "Business": 0.025936599423631124, "Ground Truth": "Healthy living"}, {"Healthy living": 0.014908256880733946, "Parenting": 0.8555045871559633, "Entertainment": 0.008027522935779817, "Food & drink": 0.009174311926605505, "Style & beauty": 0.014908256880733946, "Wellness": 0.05619266055045872, "Comedy": 0.009174311926605505, "Politics": 0.014908256880733946, "Queer voices": 0.005733944954128441, "Travel": 0.008027522935779817, "Business": 0.0034403669724770644, "Ground Truth": "Parenting"}, {"Healthy living": 0.004935225169648365, "Parenting": 0.006169031462060457, "Entertainment": 0.8864898210980876, "Food & drink": 0.001850709438618137, "Style & beauty": 0.008019740900678593, "Wellness": 0.006785934608266502, "Comedy": 0.03146206045650833, "Politics": 0.02961135101789019, "Queer voices": 0.012338062924120914, "Travel": 0.008019740900678593, "Business": 0.00431832202344232, "Ground Truth": "Entertainment"}, {"Healthy living": 0.006546644844517185, "Parenting": 0.009819967266775777, "Entertainment": 0.0016366612111292963, "Food & drink": 0.8805237315875614, "Style & beauty": 0.008183306055646482, "Wellness": 0.04746317512274959, "Comedy": 0.0032733224222585926, "Politics": 0.0016366612111292963, "Queer voices": 0.0, "Travel": 0.03436988543371522, "Business": 0.006546644844517185, "Ground Truth": "Food & drink"}, {"Healthy living": 0.002008032128514056, "Parenting": 0.007028112449799197, "Entertainment": 0.01606425702811245, "Food & drink": 0.01104417670682731, "Style & beauty": 0.9046184738955824, "Wellness": 0.025100401606425703, "Comedy": 0.0030120481927710845, "Politics": 0.0, "Queer voices": 0.008032128514056224, "Travel": 0.013052208835341365, "Business": 0.010040160642570281, "Ground Truth": "Style & beauty"}, {"Healthy living": 0.017543859649122806, "Parenting": 0.03169213355970572, "Entertainment": 0.003961516694963215, "Food & drink": 0.009620826259196379, "Style & beauty": 0.011884550084889643, "Wellness": 0.8941709111488398, "Comedy": 0.0011318619128466328, "Politics": 0.00792303338992643, "Queer voices": 0.0011318619128466328, "Travel": 0.00792303338992643, "Business": 0.013016411997736276, "Ground Truth": "Wellness"}, {"Healthy living": 0.04618473895582329, "Parenting": 0.028112449799196786, "Entertainment": 0.1285140562248996, "Food & drink": 0.014056224899598393, "Style & beauty": 0.010040160642570281, "Wellness": 0.018072289156626505, "Comedy": 0.5823293172690763, "Politics": 0.13052208835341367, "Queer voices": 0.010040160642570281, "Travel": 0.01606425702811245, "Business": 0.01606425702811245, "Ground Truth": "Comedy"}, {"Healthy living": 0.008395522388059701, "Parenting": 0.0018656716417910447, "Entertainment": 0.014925373134328358, "Food & drink": 0.0003109452736318408, "Style & beauty": 0.0003109452736318408, "Wellness": 0.0046641791044776115, "Comedy": 0.007151741293532339, "Politics": 0.933768656716418, "Queer voices": 0.010572139303482588, "Travel": 0.004353233830845771, "Business": 0.013681592039800995, "Ground Truth": "Politics"}, {"Healthy living": 0.004709576138147566, "Parenting": 0.018838304552590265, "Entertainment": 0.0423861852433281, "Food & drink": 0.0, "Style & beauty": 0.006279434850863423, "Wellness": 0.018838304552590265, "Comedy": 0.01098901098901099, "Politics": 0.04866562009419152, "Queer voices": 0.8351648351648352, "Travel": 0.007849293563579277, "Business": 0.006279434850863423, "Ground Truth": "Queer voices"}, {"Healthy living": 0.0028680688336520078, "Parenting": 0.0124282982791587, "Entertainment": 0.0057361376673040155, "Food & drink": 0.019120458891013385, "Style & beauty": 0.01338432122370937, "Wellness": 0.016252390057361378, "Comedy": 0.004780114722753346, "Politics": 0.021032504780114723, "Queer voices": 0.0028680688336520078, "Travel": 0.8986615678776291, "Business": 0.0028680688336520078, "Ground Truth": "Travel"}, {"Healthy living": 0.044563279857397504, "Parenting": 0.016042780748663103, "Entertainment": 0.017825311942959002, "Food & drink": 0.0053475935828877, "Style & beauty": 0.016042780748663103, "Wellness": 0.049910873440285206, "Comedy": 0.0106951871657754, "Politics": 0.12477718360071301, "Queer voices": 0.008912655971479501, "Travel": 0.017825311942959002, "Business": 0.6880570409982175, "Ground Truth": "Business"}], "data-de4d4a4bd87f413e7b5f21aaa318cbf3": [{"index": "Precision", "variable": "Healthy living", "value": 0.7247524752475247, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Healthy living", "value": 0.5273775216138329, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Healthy living", "value": 0.6105087572977482, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Parenting", "value": 0.8298109010011123, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Parenting", "value": 0.8555045871559633, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Parenting", "value": 0.8424618859401467, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Entertainment", "value": 0.878361858190709, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Entertainment", "value": 0.8864898210980876, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Entertainment", "value": 0.8824071231194351, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Food & drink", "value": 0.8776508972267537, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Food & drink", "value": 0.8805237315875614, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Food & drink", "value": 0.8790849673202613, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Style & beauty", "value": 0.9137931034482759, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Style & beauty", "value": 0.9046184738955824, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Style & beauty", "value": 0.9091826437941473, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Wellness", "value": 0.7959697732997482, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Wellness", "value": 0.8941709111488398, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Wellness", "value": 0.8422174840085288, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Comedy", "value": 0.7178217821782178, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Comedy", "value": 0.5823293172690763, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Comedy", "value": 0.6430155210643016, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Politics", "value": 0.9080737828847898, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Politics", "value": 0.933768656716418, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Politics", "value": 0.9207419898819562, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Queer voices", "value": 0.8594507269789984, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Queer voices", "value": 0.8351648351648352, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Queer voices", "value": 0.8471337579617836, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Travel", "value": 0.8909952606635071, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Travel", "value": 0.8986615678776291, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Travel", "value": 0.8948119942884342, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Business", "value": 0.7568627450980392, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Business", "value": 0.6880570409982175, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Business", "value": 0.7208216619981326, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Macro avg", "value": 0.8321403005652435, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Macro avg", "value": 0.8078787695023675, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Macro avg", "value": 0.817489798788625, "Model": "DistilBERT"}, {"index": "Precision", "variable": "Weighted avg", "value": 0.8535147218870888, "Model": "DistilBERT"}, {"index": "Recall", "variable": "Weighted avg", "value": 0.8562185478073329, "Model": "DistilBERT"}, {"index": "F1-score", "variable": "Weighted avg", "value": 0.8531730475560729, "Model": "DistilBERT"}]}};
+    var embedOpt = {"mode": "vega-lite"};
+
+    function showError(el, error){
+        el.innerHTML = ('<div class="error" style="color:red;">'
+                        + '<p>JavaScript Error: ' + error.message + '</p>'
+                        + "<p>This usually means there's a typo in your chart specification. "
+                        + "See the javascript console for the full traceback.</p>"
+                        + '</div>');
+        throw error;
+    }
+    const el = document.getElementById('chart-dl-performance');
+    vegaEmbed("#chart-dl-performance", spec, embedOpt)
+      .catch(error => showError(el, error));
+  })(vegaEmbed);
+</script>
 {% endblock content %}

@@ -4,11 +4,12 @@
     --black-russian: rgba(31, 31, 35, 1);
     --dark: rgba(18, 18, 19, 1);
     --nero-light: #282828;
-    --text: #FFFFFF;
+    --text: #E0E0E0;
     --text-back: #B3B3B3;
+    --takeaway: rgba(40, 53, 87, 0.75);
 
-    --background: rgba(20, 20, 22, 1);
-    --background-opaque: rgba(20, 20, 22, 0.8);
+    --background: rgba(22, 22, 24, 1);
+    --background-opaque: rgba(20, 20, 24, 0.8);
 
     --red: rgb(160, 16, 16);
     --red-opaque: rgba(120, 16, 16, 0.5);
@@ -79,6 +80,7 @@ h1, h2, h3, h4, h5, h6 {
     scroll-margin-top: 100px;
     margin: 10px 0;
     text-align: left;
+    font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 
@@ -101,10 +103,10 @@ p > a {
 /* Text options */
 p {
     font-size: 20px;
-    line-height: 150%;
+    line-height: 175%;
     text-align: justify;
     color: var(--text);
-    font-size: 22px;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 
 
@@ -128,9 +130,12 @@ a {
 
 /* Standard list options */
 ul > li {
-    display: block;
     margin: 0;
     padding: 0;
+
+    color: var(--text);
+    font-size: 20px;
+    text-align: left;
 }
 
 
@@ -373,6 +378,7 @@ div#header-social > ul {
     color: var(--text);
     margin: 0;
     padding: 0;
+    list-style-type: none;
 }
 
 header > div#header-space { grid-area: hspace; }
@@ -420,10 +426,6 @@ div#article-navigation div {
 
 
 div#article-navigation > div {
-    overflow-y: auto;
-    overflow: scroll;
-    text-align: center;
-
     margin-left: 10px;
     border-left: 1px solid var(--text-back);
 }
@@ -519,6 +521,7 @@ div:hover > #project-title { animation: glow 0.30s ease-in-out 0.1s 1 forwards; 
 ol > li {
     color: var(--text);
     font-size: 20px;
+    text-align: left;
     margin: 0px 20px 20px 0px;
 }
 
@@ -541,6 +544,7 @@ table, th, td {
 table {
     border-collapse: collapse;
     border-top: 1px solid var(--text-back);
+    margin: 0 auto;
     width: 100%;
 }
 
@@ -603,4 +607,81 @@ td:hover {
 .content-error > h1 {
     border-bottom: 1px solid var(--text-back);
     padding: 10px;
+}
+
+
+.takeaways {
+    border: 2px solid var(--text-back);
+    border-radius: 10px;
+    padding: 10px 20px;
+    margin: 20px auto;
+
+    width: 80%;
+    background-color: var(--takeaway);
+}
+
+/* Highlight.js config */
+code {
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+
+/* Figures: Plots and tables */
+.figure {
+    padding: 0 auto;
+}
+
+.figure > p {
+    display: block;
+    text-align: justify;
+    font-size: 16px;
+    width: 61.803%;
+
+    border: 1px solid var(--text-back);
+    border-radius: 10px;
+    background-color: var(--takeaway);
+    margin: 0 auto;
+    padding: 10px;
+}
+
+
+.model-widget {
+    border: 2px solid var(--text-back);
+    border-radius: 25px;
+    padding: 25px;
+    color: var(--nero-light);
+}
+
+label {
+    display: block;
+    color: var(--text);
+    font-size: 20px;
+    padding: 10px;
+}
+
+input {
+    display: block;
+    font-size: 20px;
+
+    border: 1px solid var(--text-back);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    
+    color: var(--text);
+    background-color: var(--nero-light);
+}
+
+
+input[type=submit] {
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+   background: linear-gradient(15deg, var(--nero-light) 50%, var(--red-opaque));
+}
+
+.model-results {
+    width: 61.8034%;
 }

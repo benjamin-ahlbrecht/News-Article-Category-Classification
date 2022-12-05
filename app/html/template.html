@@ -6,14 +6,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{{ id }}</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
+
+    <!-- Site Icons -->
     <script
       src="https://kit.fontawesome.com/c640195d93.js"
       crossorigin="anonymous"
     ></script>
+
+    <!-- Table of Contents Rendering -->
     <script src="../scripts/table-of-contents.js"></script>
+
+    <!-- Progress Bar  -->
     <script src="../scripts/progress-bar.js"></script>
+
+    <!-- Code Highlighting -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/stackoverflow-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>
+      hljs.highlightAll();
+    </script>
+
+    <!-- Math Typesetting (KaTeX) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.css"
+      integrity="sha384-Juol1FqnotbkyZUT5Z7gUPjQ9gzlwCENvUZTpQBAPxtusdwFLRy382PSDx5UUJ4/"
+      crossorigin="anonymous"
+    />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/katex.min.js"
+      integrity="sha384-97gW6UIJxnlKemYavrqDHSX3SiygeOwIZhwyOKRfSaf0JWKRVj9hLASHgFTzT+0O"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/katex@0.16.3/dist/contrib/auto-render.min.js"
+      integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
+      crossorigin="anonymous"
+      onload="renderMathInElement(document.body);"
+    ></script>
+
+    <!-- Altair Plotting -->
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm//vega@5"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm//vega-lite@4.17.0"
+    ></script>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm//vega-embed@6"
+    ></script>
   </head>
+  <!-- DOCUMENT BEGIN -->
   <body>
     <header>
       <div id="header-name">
