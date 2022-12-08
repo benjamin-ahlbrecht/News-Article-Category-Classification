@@ -61,6 +61,14 @@
     </tr>
   </table>
 </div>
+<script>
+  const url = "http://127.0.0.1/distilbert/Trump";
+
+  response = fetch(url)
+    .then(data => { return data.json() })
+
+  console.log(response)
+</script>
 
 <div class="takeaways">
 <p>
@@ -71,10 +79,16 @@
       based on its context.
     </li>
     <li>
-      We compare the performance and interpretability of classical machine
+      We compare the performance of classical machine
       learning models and a DistilBERT model
     </li>
-    <li>Test</li>
+    <li>
+      DistilBERT model achieves an average \(\text{F}_1\) score of approximately
+      85%.
+    </li>
+    <li>
+      We demonstrate how to save, load, and deploy the DistilBERT model.
+    </li>
   </ul>
 </p>
 </div>
