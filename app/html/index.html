@@ -62,11 +62,8 @@
   </table>
 </div>
 <script>
-  const url = "http://127.0.0.1/distilbert/Trump";
-
-  response = fetch(url)
-    .then(data => { return data.json() })
-
+  const url = "http://localhost:81/distilbert/Hello?return_probabilities=true";
+  response = fetch(url).then(data => { return data.json() });
   console.log(response)
 </script>
 
