@@ -4,7 +4,7 @@ Contextual Advertising describes the process of targeting advertisements to user
 
 ## Deployment
 
-This work can be found as a project on my personal site. To find out more about the models, how they perform, were evaluated, and to interact with the DistilBERT model, please visit [`benjamin-ahlbrecht.dev/projects/contextual-advertising`](https://benjamin-ahlbrecht.dev/projecs/contextual-advertising).
+This work can be found as a project on my personal site. To find out more about the models, how they perform, were evaluated, and to interact with the DistilBERT model, please visit [`benjamin-ahlbrecht.dev/projects/contextual-advertising`](https://benjamin-ahlbrecht.dev/projects/contextual-advertising).
 
 ## Data
 
