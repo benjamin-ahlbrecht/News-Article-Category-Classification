@@ -1,7 +1,0 @@
-# Neural Networks
-tensorflow>=2.11.0
-ktrain>=0.31.10
-
-# API
-fastapi>=0.88.0
-uvicorn>=0.20.0
