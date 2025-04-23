@@ -22,11 +22,7 @@ To run the Jupyter Notebook yourself, I recommend to use the Kaggle Environment 
 The Article can be locally hosted using [FastAPI](https://fastapi.tiangolo.com/). Begin by cloning the repository:
 
 ```bash
-# Via SSH
-git clone git@gitlab.com:BAhlbrecht/contextual-advertising-ml-dl.git
-
-# Via HTTPS
-git clone https://gitlab.com/BAhlbrecht/contextual-advertising-ml-dl.git
+git clone https://github.com/benjamin-ahlbrecht/News-Article-Category-Classification.git
 ```
 
 Next, navigate to the `/app/` directory:
