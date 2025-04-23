@@ -1,4 +1,4 @@
-# Contextual Advertising using Machine- and Deep-Learning
+# New Article Category Classification
 
 Contextual Advertising describes the process of targeting advertisements to users based on the context of a given website's contents. Here, we tackle this issue using a variety of machine-learning models and a DistilBERT deep-learning model. Decision Trees, Random Forests, and Multinomial Logistic Regression are utilized to make contextual advertising decisions based on pre-processed text data. DistilBERT uses pre-embedded word vectors to help make more rigorous classifications.
 
